@@ -59,6 +59,13 @@ TogglesPanel::TogglesPanel(QWidget *parent) : ListWidget(parent) {
                                   "../assets/offroad/icon_network.png",
                                   this));
 
+  // KRKeegan offer enable gas
+  addItem(new ParamControl("EnableGasOnCruise",
+                                  "Enable Gas on Cruise",
+                                  "Pressing the gas pedal will NOT disengage openpilot, while this is the default design for Toyota, this is NOT enabled by default for OpenPilot.  Use at your own risk!!",
+                                  "../assets/offroad/icon_gas.png",
+                                  this));
+
   ParamControl *record_toggle = new ParamControl("RecordFront",
                                                  "Record and Upload Driver Camera",
                                                  "Upload data from the driver facing camera and help improve the driver monitoring algorithm.",
