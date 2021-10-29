@@ -138,22 +138,23 @@ PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {
   main_layout->setContentsMargins(80, 90, 80, 60);
   main_layout->setSpacing(0);
 
+  // KRKeegan Remove Prime Ad
   QLabel *upgrade = new QLabel(tr("Upgrade Now"));
   upgrade->setStyleSheet("font-size: 75px; font-weight: bold;");
-  main_layout->addWidget(upgrade, 0, Qt::AlignTop);
-  main_layout->addSpacing(50);
+  //main_layout->addWidget(upgrade, 0, Qt::AlignTop);
+  //main_layout->addSpacing(50);
 
   QLabel *description = new QLabel(tr("Become a comma prime member at connect.comma.ai"));
   description->setStyleSheet("font-size: 56px; font-weight: light; color: white;");
   description->setWordWrap(true);
-  main_layout->addWidget(description, 0, Qt::AlignTop);
+  //main_layout->addWidget(description, 0, Qt::AlignTop);
 
-  main_layout->addStretch();
+  //main_layout->addStretch();
 
   QLabel *features = new QLabel(tr("PRIME FEATURES:"));
   features->setStyleSheet("font-size: 41px; font-weight: bold; color: #E5E5E5;");
-  main_layout->addWidget(features, 0, Qt::AlignBottom);
-  main_layout->addSpacing(30);
+  //main_layout->addWidget(features, 0, Qt::AlignBottom);
+  //main_layout->addSpacing(30);
 
   QVector<QString> bullets = {tr("Remote access"), tr("24/7 LTE connectivity"), tr("1 year of drive storage"), tr("Turn-by-turn navigation")};
   for (auto &b : bullets) {
@@ -161,7 +162,7 @@ PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {
     QLabel *l = new QLabel(check + b);
     l->setAlignment(Qt::AlignLeft);
     l->setStyleSheet("font-size: 50px; margin-bottom: 15px;");
-    main_layout->addWidget(l, 0, Qt::AlignBottom);
+    //main_layout->addWidget(l, 0, Qt::AlignBottom);
   }
 
   setStyleSheet(R"(
