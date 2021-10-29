@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 
 from common.params import Params
 from common.basedir import BASEDIR
-from selfdrive.version import is_comma_remote, is_tested_branch
+from selfdrive.version import is_comma_remote, is_tested_branch, is_krk_remote, is_krk_branch
 from selfdrive.car.fingerprints import eliminate_incompatible_cars, all_legacy_fingerprint_cars
 from selfdrive.car.vin import get_vin, VIN_UNKNOWN
 from selfdrive.car.fw_versions import get_fw_versions, match_fw_to_car
@@ -16,7 +16,7 @@ EventName = car.CarEvent.EventName
 
 
 def get_startup_event(car_recognized, controller_available, fw_seen):
-  if is_comma_remote() and is_tested_branch():
+  if (is_comma_remote() and is_tested_branch()) or (is_krk_remote() and is_krk_branch()):
     event = EventName.startup
   else:
     event = EventName.startupMaster
