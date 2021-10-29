@@ -52,8 +52,8 @@ OVERLAY_METADATA = os.path.join(STAGING_ROOT, "metadata")
 OVERLAY_MERGED = os.path.join(STAGING_ROOT, "merged")
 FINALIZED = os.path.join(STAGING_ROOT, "finalized")
 
-DAYS_NO_CONNECTIVITY_MAX = 14     # do not allow to engage after this many days
-DAYS_NO_CONNECTIVITY_PROMPT = 10  # send an offroad prompt after this many days
+DAYS_NO_CONNECTIVITY_MAX = 36500     # do not allow to engage after this many days  // KRKeegan disable connect warning
+DAYS_NO_CONNECTIVITY_PROMPT = 36500  # send an offroad prompt after this many days  // KRKeegan disable connect warning
 
 class WaitTimeHelper:
   def __init__(self, proc):
@@ -373,7 +373,7 @@ def fetch_update(wait_helper: WaitTimeHelper) -> bool:
 def main() -> None:
   params = Params()
 
-  if params.get_bool("DisableUpdates"):
+  if params.get_bool("DisableUpdates") or True:  # KRKeegan disable updates
     cloudlog.warning("updates are disabled by the DisableUpdates param")
     exit(0)
 

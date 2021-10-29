@@ -181,31 +181,7 @@ PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {
   main_layout->setContentsMargins(80, 90, 80, 60);
   main_layout->setSpacing(0);
 
-  QLabel *upgrade = new QLabel("Upgrade Now");
-  upgrade->setStyleSheet("font-size: 75px; font-weight: bold;");
-  main_layout->addWidget(upgrade, 0, Qt::AlignTop);
-  main_layout->addSpacing(50);
-
-  QLabel *description = new QLabel("Become a comma prime member at connect.comma.ai");
-  description->setStyleSheet("font-size: 60px; font-weight: light; color: white;");
-  description->setWordWrap(true);
-  main_layout->addWidget(description, 0, Qt::AlignTop);
-
-  main_layout->addStretch();
-
-  QLabel *features = new QLabel("PRIME FEATURES:");
-  features->setStyleSheet("font-size: 41px; font-weight: bold; color: #E5E5E5;");
-  main_layout->addWidget(features, 0, Qt::AlignBottom);
-  main_layout->addSpacing(30);
-
-  QVector<QString> bullets = {"Remote access", "14 days of storage", "Developer perks"};
-  for (auto &b: bullets) {
-    const QString check = "<b><font color='#465BEA'>✓</font></b> ";
-    QLabel *l = new QLabel(check + b);
-    l->setAlignment(Qt::AlignLeft);
-    l->setStyleSheet("font-size: 50px; margin-bottom: 15px;");
-    main_layout->addWidget(l, 0, Qt::AlignBottom);
-  }
+  // KRKeegan Remove Prime Ad
 
   setStyleSheet(R"(
     PrimeAdWidget {
