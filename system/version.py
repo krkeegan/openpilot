@@ -12,6 +12,7 @@ from openpilot.common.git import get_commit, get_origin, get_branch, get_short_b
 
 RELEASE_BRANCHES = ['release3-staging', 'release3', 'nightly']
 TESTED_BRANCHES = RELEASE_BRANCHES + ['devel', 'devel-staging']
+KRK_BRANCHES = ['Rav4-TSS2']
 
 BUILD_METADATA_FILENAME = "build.json"
 
@@ -81,6 +82,10 @@ class OpenpilotMetadata:
     return self.git_normalized_origin == "github.com/commaai/openpilot"
 
   @property
+  def krk_remote(self) -> bool:
+    return self.git_normalized_origin == "github.com/krkeegan/openpilot"
+
+  @property
   def git_normalized_origin(self) -> str:
     return self.git_origin \
       .replace("git@", "", 1) \
@@ -97,6 +102,10 @@ class BuildMetadata:
   @property
   def tested_channel(self) -> bool:
     return self.channel in TESTED_BRANCHES
+
+  @property
+  def krk_channel(self) -> bool:
+    return self.channel in KRK_BRANCHES
 
   @property
   def release_channel(self) -> bool:
