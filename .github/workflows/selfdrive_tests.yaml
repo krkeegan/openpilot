@@ -305,6 +305,7 @@ jobs:
                         carParams.longitudinalActuatorDelayLowerBound \
                         carParams.longitudinalActuatorDelayUpperBound carParams.stoppingDecelRate \
                         carParams.vEgoStarting carParams.vEgoStopping controlsState.ufAccelCmd \
+                        carState.distanceLines \
                         --ignore-msgs longitudinalPlan sendcan && \
                         coverage xml"
     - name: "Upload coverage to Codecov"
