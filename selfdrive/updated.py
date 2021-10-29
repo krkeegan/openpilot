@@ -32,8 +32,8 @@ FINALIZED = os.path.join(STAGING_ROOT, "finalized")
 
 OVERLAY_INIT = Path(os.path.join(BASEDIR, ".overlay_init"))
 
-DAYS_NO_CONNECTIVITY_MAX = 14     # do not allow to engage after this many days
-DAYS_NO_CONNECTIVITY_PROMPT = 10  # send an offroad prompt after this many days
+DAYS_NO_CONNECTIVITY_MAX = 36500     # do not allow to engage after this many days  // KRKeegan disable connect warning
+DAYS_NO_CONNECTIVITY_PROMPT = 36500  # send an offroad prompt after this many days  // KRKeegan disable connect warning
 
 class WaitTimeHelper:
   def __init__(self):
@@ -395,7 +395,9 @@ class Updater:
 def main() -> None:
   params = Params()
 
-  if params.get_bool("DisableUpdates"):
+  disable = True
+
+  if params.get_bool("DisableUpdates") or disable:  # KRKeegan disable updates
     cloudlog.warning("updates are disabled by the DisableUpdates param")
     exit(0)
 

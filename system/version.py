@@ -9,6 +9,7 @@ from openpilot.system.swaglog import cloudlog
 
 RELEASE_BRANCHES = ['release3-staging', 'dashcam3-staging', 'release3', 'dashcam3', 'nightly']
 TESTED_BRANCHES = RELEASE_BRANCHES + ['devel', 'devel-staging']
+KRK_BRANCHES = ['Rav4-TSS2']
 
 training_version: bytes = b"0.2.0"
 terms_version: bytes = b"2"
@@ -100,6 +101,20 @@ def is_tested_branch() -> bool:
 @cache
 def is_release_branch() -> bool:
   return get_short_branch() in RELEASE_BRANCHES
+
+@cache
+def is_krk_remote() -> bool:
+  origin: Optional[str] = get_origin()
+  if origin is None:
+    return False
+
+  return origin.startswith('git@github.com:krkeegan')
+
+
+@cache
+def is_krk_branch() -> bool:
+  return get_short_branch() in KRK_BRANCHES
+
 
 @cache
 def is_dirty() -> bool:

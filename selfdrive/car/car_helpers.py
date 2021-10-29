@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 from cereal import car
 from openpilot.common.params import Params
 from openpilot.common.basedir import BASEDIR
-from openpilot.system.version import is_comma_remote, is_tested_branch
+from openpilot.system.version import is_comma_remote, is_tested_branch, is_krk_remote, is_krk_branch
 from openpilot.selfdrive.car.interfaces import get_interface_attr
 from openpilot.selfdrive.car.fingerprints import eliminate_incompatible_cars, all_legacy_fingerprint_cars
 from openpilot.selfdrive.car.vin import get_vin, is_valid_vin, VIN_UNKNOWN
@@ -20,7 +20,7 @@ EventName = car.CarEvent.EventName
 
 
 def get_startup_event(car_recognized, controller_available, fw_seen):
-  if is_comma_remote() and is_tested_branch():
+  if (is_comma_remote() and is_tested_branch()) or (is_krk_remote() and is_krk_branch()):
     event = EventName.startup
   else:
     event = EventName.startupMaster
