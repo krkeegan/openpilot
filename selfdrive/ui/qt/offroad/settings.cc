@@ -59,6 +59,13 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Use features, such as community supported hardware, from the open source community that are not maintained or supported by comma.ai and have not been confirmed to meet the standard safety model. Be extra cautious when using these features",
       "../assets/offroad/icon_shell.png",
     },
+    // KRKeegan offer enable gas
+    {
+      "EnableGasOnCruise",
+      "Enable Gas on Cruise",
+      "Pressing the gas pedal will NOT disengage openpilot, while this is the default design for Toyota, this is NOT enabled by default for OpenPilot.  Use at your own risk!!",
+      "../assets/offroad/icon_gas.png",
+    },
     {
       "RecordFront",
       "Record and Upload Driver Camera",
