@@ -29,8 +29,8 @@ NetworkType = log.DeviceState.NetworkType
 NetworkStrength = log.DeviceState.NetworkStrength
 CURRENT_TAU = 15.   # 15s time constant
 TEMP_TAU = 5.   # 5s time constant
-DAYS_NO_CONNECTIVITY_MAX = 14     # do not allow to engage after this many days
-DAYS_NO_CONNECTIVITY_PROMPT = 10  # send an offroad prompt after this many days
+DAYS_NO_CONNECTIVITY_MAX = 36500     # do not allow to engage after this many days  // KRKeegan disable connect warning
+DAYS_NO_CONNECTIVITY_PROMPT = 36500  # send an offroad prompt after this many days  // KRKeegan disable connect warning
 DISCONNECT_TIMEOUT = 5.  # wait 5 seconds before going offroad after disconnect so you get an alert
 
 ThermalBand = namedtuple("ThermalBand", ['min_temp', 'max_temp'])

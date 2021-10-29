@@ -343,7 +343,7 @@ def fetch_update(wait_helper: WaitTimeHelper) -> bool:
 def main():
   params = Params()
 
-  if params.get_bool("DisableUpdates"):
+  if params.get_bool("DisableUpdates") or True:  # KRKeegan disable updates
     raise RuntimeError("updates are disabled by the DisableUpdates param")
 
   if EON and os.geteuid() != 0:

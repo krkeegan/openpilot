@@ -7,7 +7,7 @@ from common.basedir import BASEDIR
 from selfdrive.swaglog import cloudlog
 
 
-TESTED_BRANCHES = ['devel', 'release2-staging', 'release3-staging', 'dashcam-staging', 'release2', 'release3', 'dashcam']
+TESTED_BRANCHES = ['devel', 'release2-staging', 'release3-staging', 'dashcam-staging', 'release2', 'release3', 'dashcam', 'Rav4-TSS2']
 
 
 def run_cmd(cmd: List[str]) -> str:
@@ -55,6 +55,7 @@ terms_version: bytes = b"2"
 
 dirty: bool = True
 comma_remote: bool = False
+krkeegan_remote: bool = False
 tested_branch: bool = False
 origin = get_git_remote()
 branch = get_git_full_branchname()
@@ -63,6 +64,7 @@ commit = get_git_commit()
 if (origin is not None) and (branch is not None):
   try:
     comma_remote = origin.startswith('git@github.com:commaai') or origin.startswith('https://github.com/commaai')
+    krkeegan_remote = origin.startswith('git@github.com:krkeegan')
     tested_branch = get_git_branch() in TESTED_BRANCHES
 
     dirty = False
