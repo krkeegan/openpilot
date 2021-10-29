@@ -64,6 +64,13 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Upload full logs and full resolution video by default while on Wi-Fi. If not enabled, individual logs can be marked for upload at useradmin.comma.ai.",
       "../assets/offroad/icon_network.png",
     },
+    // KRKeegan offer enable gas
+    {
+      "EnableGasOnCruise",
+      "Enable Gas on Cruise",
+      "Pressing the gas pedal will NOT disengage openpilot, while this is the default design for Toyota, this is NOT enabled by default for OpenPilot.  Use at your own risk!!",
+      "../assets/offroad/icon_gas.png",
+    },
     {
       "RecordFront",
       "Record and Upload Driver Camera",
