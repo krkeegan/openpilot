@@ -1,149 +1,131 @@
-![](https://i.imgur.com/b0ZyIx5.jpg)
+WARNING
+------
 
-Table of Contents
-=======================
+**USE OF ANY CODE IN THIS REPOSITORY IS AT YOUR OWN RISK.  See Waiver Below**
 
-* [What is openpilot?](#what-is-openpilot)
-* [Running in a car](#running-on-a-dedicated-device-in-a-car)
-* [Running on PC](#running-on-pc)
-* [Community and Contributing](#community-and-contributing)
-* [User Data and comma Account](#user-data-and-comma-account)
-* [Safety and Testing](#safety-and-testing)
-* [Directory Structure](#directory-structure)
-* [Licensing](#licensing)
+**I AM NOT A SOFTWARE ENGINEER AND HAVE NO FORMAL TRAINING OR EXPERIENCE WITH ANY OF THIS.  THERE ARE BUGS AND ERRORS IN THIS CODE WHICH IS AT BEST ALPHA QUALITY SOFTWARE AND SHOULD ONLY BE USED FOR RESEARCH PURPOSES. THIS IS NOT A PRODUCT. YOU ARE RESPONSIBLE FOR COMPLYING WITH LOCAL LAWS AND REGULATIONS. NO WARRANTY EXPRESSED OR IMPLIED.**
+
+**You must keep your eyes on the road at all times and be ready to take control of the car at any point.**
+
+
+---
+
+- [WARNING](#warning)
+- [What is openpilot?](#what-is-openpilot)
+- [What is in this fork?](#what-is-in-this-fork)
+- [Features](#features)
+  - [Abandoned Features](#abandoned-features)
+  - [Previous Features that have been Merged into Comma Repo:](#previous-features-that-have-been-merged-into-comma-repo)
+- [Will you add something?](#will-you-add-something)
+- [Distance Profiles](#distance-profiles)
+- [Distance Profile Cost Adjustments](#distance-profile-cost-adjustments)
+- [Improve Acceleration from Stop](#improve-acceleration-from-stop)
+- [Development Process](#development-process)
+- [Licensing](#licensing)
+- [WAIVER](#waiver)
 
 ---
 
 What is openpilot?
 ------
 
-[openpilot](http://github.com/commaai/openpilot) is an open source driver assistance system. Currently, openpilot performs the functions of Adaptive Cruise Control (ACC), Automated Lane Centering (ALC), Forward Collision Warning (FCW), and Lane Departure Warning (LDW) for a growing variety of [supported car makes, models, and model years](docs/CARS.md). In addition, while openpilot is engaged, a camera-based Driver Monitoring (DM) feature alerts distracted and asleep drivers. See more about [the vehicle integration](docs/INTEGRATION.md) and [limitations](docs/LIMITATIONS.md).
+[openpilot](http://github.com/commaai/openpilot) is an open source driver assistance system.
 
-<table>
-  <tr>
-    <td><a href="https://youtu.be/NmBfgOanCyk" title="Video By Greer Viau"><img src="https://i.imgur.com/1w8c6d2.jpg"></a></td>
-    <td><a href="https://youtu.be/VHKyqZ7t8Gw" title="Video By Logan LeGrand"><img src="https://i.imgur.com/LnBucik.jpg"></a></td>
-    <td><a href="https://youtu.be/VxiR4iyBruo" title="Video By Charlie Kim"><img src="https://i.imgur.com/4Qoy48c.jpg"></a></td>
-    <td><a href="https://youtu.be/-IkImTe1NYE" title="Video By Aragon"><img src="https://i.imgur.com/04VNzPf.jpg"></a></td>
-  </tr>
-  <tr>
-    <td><a href="https://youtu.be/iIUICQkdwFQ" title="Video By Logan LeGrand"><img src="https://i.imgur.com/b1LHQTy.jpg"></a></td>
-    <td><a href="https://youtu.be/XOsa0FsVIsg" title="Video By PinoyDrives"><img src="https://i.imgur.com/6FG0Bd8.jpg"></a></td>
-    <td><a href="https://youtu.be/bCwcJ98R_Xw" title="Video By JS"><img src="https://i.imgur.com/zO18CbW.jpg"></a></td>
-    <td><a href="https://youtu.be/BQ0tF3MTyyc" title="Video By Tsai-Fi"><img src="https://i.imgur.com/eZzelq3.jpg"></a></td>
-  </tr>
-</table>
-
-
-Running on a dedicated device in a car
+What is in this fork?
 ------
+This is my personal fork of openpilot that includes modifications that I want and nothing else.  I drive a __2019 Rav4 Hybrid (TSS2)__ most of the modifications were designed for my vehicle and my personal taste and may not work on other vehicles.
 
-To use openpilot in a car, you need four things
-* A supported device to run this software: a [comma three](https://comma.ai/shop/products/three).
-* This software. The setup procedure of the comma three allows the user to enter a URL for custom software.
-The URL, openpilot.comma.ai will install the release version of openpilot. To install openpilot master, you can use installer.comma.ai/commaai/master, and replacing commaai with another GitHub username can install a fork.
-* One of [the 150+ supported cars](docs/CARS.md). We support Honda, Toyota, Hyundai, Nissan, Kia, Chrysler, Lexus, Acura, Audi, VW, and more. If your car is not supported but has adaptive cruise control and lane-keeping assist, it's likely able to run openpilot.
-* A [car harness](https://comma.ai/shop/products/car-harness) to connect to your car.
+I am publishing this work to help others understand how openpilot works.  As such, __I am NOT providing support for installation or troubleshooting.__  If you are looking for a supported fork, I recommend [Shane's Stock Additions](https://github.com/sshane/openpilot) fork.  It contains many of the same features.
 
-We have detailed instructions for [how to mount the device in a car](https://comma.ai/setup).
-
-Running on PC
+Features
 ------
+Currently this fork contains the following modifications:
+* 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.  [Feature Toyota Distance Button](https://github.com/krkeegan/openpilot/tree/feature_toyota_distance_btn)
+  * These profiles are described below.
+  * There are no on screen messages regarding the distance profile selected, only the icons on the vehicle's HUD.
+* Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
+* Lower volume to 70% [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
+* Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
+* Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
+  * Tweaks deal with the laggy acceleration response on toyotas
+  * Higher acceleration limit at low speed, lower limit at high speed
+  * Decrease `a_change_cost` timescale to be closer to toyota lag values
+* Hybrid Battery Saver, Max of 8 Hours of Standby
+  * The standby time improved significantly around version 0.8, however I recently had my 12v replaced under warranty because it failed the load test. I strongly suspect the Comma is to blame.  8 hours of standby time is more than enough to upload my drive data and stay on while I am at work.  It does mean a fresh bootup every morning, however, the C3 boot times are very reasonable ~30s.
+* Other features from future versions of Openpilot as I see fit
 
-All of openpilot's services can run as normal on a PC, even without special hardware or a car. To develop or experiment with openpilot you can run openpilot on recorded or simulated data.
+### Abandoned Features
+* Raw toggle added back in to enable automatic log uploading. [Feature Raw Logs](https://github.com/krkeegan/openpilot/tree/feature_raw_logs_upload)
+  * Comma blocks the upload of full camera and log files from the device with an http 412 error.  I suspect they are trying to save money on bandwidth costs.  I think the block tirggered when a device authentication is used, so presumably you could get around this by generating and copying a new authentication to the device.  However I elected to use the API and have a little script that fires off whenever my device is seen on my home network.
 
-With openpilot's tools, you can plot logs, replay drives, and watch the full-res camera streams. See [the tools README](tools/README.md) for more information.
+### Previous Features that have been Merged into Comma Repo:
+* Display blue barriers when openpilot is engaged.
+* Use wide camera for light sensor, better night performance.
+* Toggle Disengage on Gas. (Openpilot adopted in 8.14)
 
-You can also run openpilot in simulation [with the CARLA simulator](tools/sim/README.md). This allows openpilot to drive around a virtual car on your Ubuntu machine. The whole setup should only take a few minutes but does require a decent GPU.
+Will you add something?
+---
+You can certainly ask, but the criteria for adding it is:
 
-A PC running openpilot can also control your vehicle if it is connected to a [webcam](https://github.com/commaai/openpilot/tree/master/tools/webcam), a [black panda](https://comma.ai/shop/products/panda), and a [harness](https://comma.ai/shop/products/car-harness).
+* Is it something I would use
+* Is it something I consider safe?  I am pretty cautious.
+* Is it easy to maintain?  I don't want this to be a chore to maintain.
 
-Community and Contributing
-------
+If the answer to any of those is __no__, then I probably won't add it.
 
-openpilot is developed by [comma](https://comma.ai/) and by users like you. We welcome both pull requests and issues on [GitHub](http://github.com/commaai/openpilot). Bug fixes and new car ports are encouraged. Check out [the contributing docs](docs/CONTRIBUTING.md).
+Distance Profiles
+---
+I extrapolated out the speeds, so that the distance is set about every ~5mph.  This just makes it easier to edit.
 
-Documentation related to openpilot development can be found on [docs.comma.ai](https://docs.comma.ai). Information about running openpilot (e.g. FAQ, fingerprinting, troubleshooting, custom forks, community hardware) should go on the [wiki](https://github.com/commaai/openpilot/wiki).
+* Stock - Unchanged, this uses the default settings in openpilot with follow time of 1.45s.
+* Relaxed - This is set to 1.25s across the board.
+* Traffic - At low speeds this is set to 1.25s and gradually drops down to 1.05s at freeway speeds.
 
-You can add support for your car by following guides we have written for [Brand](https://blog.comma.ai/how-to-write-a-car-port-for-openpilot/) and [Model](https://blog.comma.ai/openpilot-port-guide-for-toyota-models/) ports. Generally, a car with adaptive cruise control and lane keep assist is a good candidate. [Join our Discord](https://discord.comma.ai) to discuss car ports: most car makes have a dedicated channel.
+Distance Profile Cost Adjustments
+---
+As the following distance decreases I have decreased the `jerk` and `a_change` costs and increased the `danger` cost.  This is to be expected, as the follow distance decreases the allowable rate of change in deceleration has to increase, this will make the acceleration more jerky.  Below is an example of this, as you can see the relaxed and traffic profiles start off following the lead closer, and then when the lead starts to slow down, they increase their rate of deceleration much faster:
 
-Want to get paid to work on openpilot? [comma is hiring](https://comma.ai/jobs/).
+![deceleration compared](https://user-images.githubusercontent.com/3046315/148848058-01d3b410-79c2-409a-ab5c-336f21ef8fd9.png)
 
-And [follow us on Twitter](https://twitter.com/comma_ai).
+Improve Acceleration from Stop
+---
+The new MPC introduced in 8.10 has a much slower acceleration profile from a standstill.  This is caused by many things, but is largely driven by the `a_change_cost` which was introduced as part of the lag compensation.  As you can see below, the rate of acceleration significantly lags behind 8.9:
 
-User Data and comma Account
-------
+![8.9 v 8.12](https://user-images.githubusercontent.com/3046315/148848373-7737a46e-a547-48f2-88ec-c2861d42e1ee.png)
 
-By default, openpilot uploads the driving data to our servers. You can also access your data through [comma connect](https://connect.comma.ai/). We use your data to train better models and improve openpilot for everyone.
+I have made adjustments to the `jerk` and `a_change` costs to allow for a faster change in acceleration at low speeds, this affects acceleration only and will not alter braking.  I also reduced the `STOP_DISTANCE` dynamically so that when the lead car pulls away, the MPC is told to maintain a closer distance, this helps cause the an earlier initial acceleration request.  The changes result in the improved profile seen below:
 
-openpilot is open source software: the user is free to disable data collection if they wish to do so.
+![8.12 v KRK](https://user-images.githubusercontent.com/3046315/148849415-2212361b-4bde-43c2-8f12-bbcdf6d833dd.png)
 
-openpilot logs the road-facing cameras, CAN, GPS, IMU, magnetometer, thermal sensors, crashes, and operating system logs.
-The driver-facing camera is only logged if you explicitly opt-in in settings. The microphone is not recorded.
+Development Process
+---
 
-By using openpilot, you agree to [our Privacy Policy](https://comma.ai/privacy). You understand that use of this software or its related services will generate certain types of user data, which may be logged and stored at the sole discretion of comma. By accepting this agreement, you grant an irrevocable, perpetual, worldwide right to comma for the use of this data.
+The comma.ai repository is a [complicated beast](https://blog.comma.ai/a-2020-theme-externalization/).  I prefer to base my daily driver branch off of the `commaai/devel` branch.  However, this branch lacks the suite of automated tests.  So I create my development branches off of `commaai/master`.  I try to pick the commit that is closest to the release version and make a branch `master-x.xx` with x.xx being the release version number.
 
-Safety and Testing
-----
+To make merging with future versions of Openpilot easier, I try to keep each "feature" on its own branch. My branches that start with `feature_` contain additional features or tweaks that have not been upstreamed into `commaai/master`.  My branches that start with `future_` contain commits that have been developed by `commaai` but were not included in the last release and are likely to be included in the next release.  Branches prefixed with `research_` are test branches that are likely used for running simulations and may not be designed for use in the real-world.
 
-* openpilot observes ISO26262 guidelines, see [SAFETY.md](docs/SAFETY.md) for more details.
-* openpilot has software-in-the-loop [tests](.github/workflows/selfdrive_tests.yaml) that run on every commit.
-* The code enforcing the safety model lives in panda and is written in C, see [code rigor](https://github.com/commaai/panda#code-rigor) for more details.
-* panda has software-in-the-loop [safety tests](https://github.com/commaai/panda/tree/master/tests/safety).
-* Internally, we have a hardware-in-the-loop Jenkins test suite that builds and unit tests the various processes.
-* panda has additional hardware-in-the-loop [tests](https://github.com/commaai/panda/blob/master/Jenkinsfile).
-* We run the latest openpilot in a testing closet containing 10 comma devices continuously replaying routes.
+The `feature_` branches are rebased to each new `master-x.xx` "release".  If I do additional work on a `feature_` branch once a release has been made, then I will generally just make new commits on the branch.  When the next release happens, I then squash this mutiple commits down into a single commit.
 
-Directory Structure
-------
-    .
-    ├── cereal              # The messaging spec and libs used for all logs
-    ├── common              # Library like functionality we've developed here
-    ├── docs                # Documentation
-    ├── opendbc             # Files showing how to interpret data from cars
-    ├── panda               # Code used to communicate on CAN
-    ├── third_party         # External libraries
-    ├── pyextra             # Extra python packages
-    └── system              # Generic services
-        ├── camerad         # Driver to capture images from the camera sensors
-        ├── clocksd         # Broadcasts current time
-        ├── hardware        # Hardware abstraction classes
-        ├── logcatd         # systemd journal as a service
-        └── proclogd        # Logs information from /proc
-    └── selfdrive           # Code needed to drive the car
-        ├── assets          # Fonts, images, and sounds for UI
-        ├── athena          # Allows communication with the app
-        ├── boardd          # Daemon to talk to the board
-        ├── car             # Car specific code to read states and control actuators
-        ├── controls        # Planning and controls
-        ├── debug           # Tools to help you debug and do car ports
-        ├── locationd       # Precise localization and vehicle parameter estimation
-        ├── loggerd         # Logger and uploader of car data
-        ├── manager         # Deamon that starts/stops all other daemons as needed
-        ├── modeld          # Driving and monitoring model runners
-        ├── monitoring      # Daemon to determine driver attention
-        ├── navd            # Turn-by-turn navigation
-        ├── sensord         # IMU interface code
-        ├── test            # Unit tests, system tests, and a car simulator
-        └── ui              # The UI
+I then merge all of the `feature_` and `future_` branches into a `merged_x.xx` branch with x.xx being the release version number.  Once I am satisfied with that this `merged_` branch has passed the automated tests, or failed for understandable reasons, I cherry-pick the commits into `Rav4-TSS2`, that I use as my daily driver branch.  The idea is that the `merged_x.xx` branch and `Rav4-TSS2` should remain consistent so that the results of the tests on `merged_x.xx` can be relied on.
+
+Sometimes I may create a `Rav4-TSS2-____` branch if I want to test changes in the vehicle before commiting them to my daily driver branch.
+
+It is all a mess, and it would make working off of my branches difficult, but since this is primarily for personal use, it works for me.
+
+While I wouldn't recommend forking my branch, each of the `feature_` branches generally having a single commit should make it relatively easy to merge my work into yours.
 
 Licensing
 ------
 
 openpilot is released under the MIT license. Some parts of the software are released under other licenses as specified.
 
-Any user of this software shall indemnify and hold harmless Comma.ai, Inc. and its directors, officers, employees, agents, stockholders, affiliates, subcontractors and customers from and against all allegations, claims, actions, suits, demands, damages, liabilities, obligations, losses, settlements, judgments, costs and expenses (including without limitation attorneys’ fees and costs) which arise out of, relate to or result from any use of this software by user.
+WAIVER
+-----
+
+Any user of this software ("User") and anyone claiming on User's behalf releases and forever discharges Kevin Keegan ("Author") and its directors, officers, employees, agents, stockholders, affiliates, subcontractors, software contributors, and customers from any and all claims, liabilities, obligations, promises, agreements, disputes, demands, damages, causes of action of any nature and kind, known or unknown, which User has or ever had or may in the future have against Author or any of the related parties arising our of or relating to the use of any software in this Repository.
+
+User shall indemnify and hold harmless Author and its directors, officers, employees, agents, stockholders, affiliates, subcontractors, software contributors, and customers from and against all allegations, claims, actions, suits, demands, damages, liabilities, obligations, losses, settlements, judgments, costs and expenses (including without limitation attorneys’ fees and costs) which arise out of, relate to or result from any use of this software by user.
 
 **THIS IS ALPHA QUALITY SOFTWARE FOR RESEARCH PURPOSES ONLY. THIS IS NOT A PRODUCT.
 YOU ARE RESPONSIBLE FOR COMPLYING WITH LOCAL LAWS AND REGULATIONS.
 NO WARRANTY EXPRESSED OR IMPLIED.**
-
----
-
-<img src="https://d1qb2nb5cznatu.cloudfront.net/startups/i/1061157-bc7e9bf3b246ece7322e6ffe653f6af8-medium_jpg.jpg?buster=1458363130" width="75"></img> <img src="https://cdn-images-1.medium.com/max/1600/1*C87EjxGeMPrkTuVRVWVg4w.png" width="225"></img>
-
-[![openpilot tests](https://github.com/commaai/openpilot/workflows/openpilot%20tests/badge.svg?event=push)](https://github.com/commaai/openpilot/actions)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/commaai/openpilot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/commaai/openpilot/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/commaai/openpilot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/commaai/openpilot/context:python)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/commaai/openpilot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/commaai/openpilot/context:cpp)
-[![codecov](https://codecov.io/gh/commaai/openpilot/branch/master/graph/badge.svg)](https://codecov.io/gh/commaai/openpilot)
