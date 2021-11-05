@@ -224,10 +224,12 @@ class LongitudinalMpc():
     # a judgement call
     # A TR below 1.2 will crash at 3+m/s^2 test with these settings
     TRs = [1.2, 1.5, 1.8]
-    j_ego_cost_multiplier = interp(self.desired_TR, TRs, [.35, .7, 1.])
+    x_ego_obstacle_cost_multiplier = interp(self.desired_TR, TRs, [4, 2, 1.])
+    j_ego_cost_multiplier = interp(self.desired_TR, TRs, [.6, .8, 1.])
     d_zone_cost_multiplier = interp(self.desired_TR, TRs, [4., 2., 1.])
 
-    W = np.diag([X_EGO_OBSTACLE_COST, X_EGO_COST, V_EGO_COST, A_EGO_COST, J_EGO_COST * j_ego_cost_multiplier])
+    W = np.diag([X_EGO_OBSTACLE_COST * x_ego_obstacle_cost_multiplier, X_EGO_COST, 
+                 V_EGO_COST, A_EGO_COST, J_EGO_COST * j_ego_cost_multiplier])
     Ws = np.tile(W[None], reps=(N,1,1))
     self.solver.cost_set_slice(0, N, 'W', Ws, api='old')
     # Setting the slice without the copy make the array not contiguous,
