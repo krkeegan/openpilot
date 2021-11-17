@@ -60,7 +60,7 @@ class CarController():
         interceptor_gas_cmd = clip(actuators.accel / PEDAL_SCALE, 0., MAX_INTERCEPTOR_GAS)
         pcm_accel_cmd = 0.18 - max(0, -actuators.accel)
 
-    pcm_accel_cmd, self.accel_steady = accel_hysteresis(pcm_accel_cmd, self.accel_steady, enabled)
+    pcm_accel_cmd = pcm_accel_cmd if enabled else 0.0
     pcm_accel_cmd = clip(pcm_accel_cmd, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
 
     # steer torque
