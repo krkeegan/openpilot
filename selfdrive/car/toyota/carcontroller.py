@@ -6,6 +6,7 @@ from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_comma
                                            create_fcw_command, create_lta_steer_command
 from selfdrive.car.toyota.values import CAR, STATIC_DSU_MSGS, NO_STOP_TIMER_CAR, TSS2_CAR, \
                                         MIN_ACC_SPEED, PEDAL_TRANSITION, CarControllerParams
+from selfdrive.car.toyota.interface import CarInterface
 from opendbc.can.packer import CANPacker
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
@@ -17,6 +18,7 @@ class CarController():
     self.last_standstill = False
     self.standstill_req = False
     self.steer_rate_limited = False
+    self.CP = CP
 
     self.packer = CANPacker(dbc_name)
     self.gas = 0
@@ -41,7 +43,8 @@ class CarController():
       interceptor_gas_cmd = clip(pedal_command, 0., MAX_INTERCEPTOR_GAS)
     else:
       interceptor_gas_cmd = 0.
-    pcm_accel_cmd = clip(actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
+    pid_accel_limits = CarInterface.get_pid_accel_limits(self.CP, CS.out.vEgo, None)  # Need to get cruise speed from somewhere
+    pcm_accel_cmd = clip(actuators.accel, pid_accel_limits[0], pid_accel_limits[1])
 
     # steer torque
     new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
