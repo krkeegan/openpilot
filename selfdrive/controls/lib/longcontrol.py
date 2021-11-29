@@ -40,7 +40,7 @@ def long_control_state_trans(CP, active, long_control_state, v_ego, v_target_fut
     elif long_control_state == LongCtrlState.starting:
       if stopping_condition:
         long_control_state = LongCtrlState.stopping
-      elif output_accel >= CP.startAccel:
+      elif output_accel - CP.startAccel >= -1e-3:
         long_control_state = LongCtrlState.pid
 
   return long_control_state
@@ -72,10 +72,11 @@ class LongControl():
       v_target_upper = interp(CP.longitudinalActuatorDelayUpperBound, T_IDXS[:CONTROL_N], long_plan.speeds)
       a_target_upper = 2 * (v_target_upper - long_plan.speeds[0])/CP.longitudinalActuatorDelayUpperBound - long_plan.accels[0]
 
+      v_target = min(v_target_lower, v_target_upper)
       a_target = min(a_target_lower, a_target_upper)
 
       v_target = long_plan.speeds[0]
-      v_target_future = long_plan.speeds[-1]
+      v_target_future = long_plan.speeds[-1]  # ~2 seconds
     else:
       v_target = 0.0
       v_target_future = 0.0
@@ -105,7 +106,7 @@ class LongControl():
 
       # Toyota starts braking more when it thinks you want to stop
       # Freeze the integrator so we don't accelerate to compensate, and don't allow positive acceleration
-      prevent_overshoot = not CP.stoppingControl and CS.vEgo < 1.5 and v_target_future < 0.7 and a_target < 0.0
+      prevent_overshoot = not CP.stoppingControl and CS.vEgo < 1.5 and v_target_future < 0.7 and v_target_future < v_target
       deadzone = interp(v_ego_pid, CP.longitudinalTuning.deadzoneBP, CP.longitudinalTuning.deadzoneV)
       freeze_integrator = prevent_overshoot
 
@@ -131,6 +132,7 @@ class LongControl():
     elif self.long_control_state == LongCtrlState.starting:
       if output_accel < CP.startAccel:
         output_accel += CP.startingAccelRate * DT_CTRL
+      output_accel = min(output_accel, CP.startAccel)
       self.reset(CS.vEgo)
 
     self.last_output_accel = output_accel
