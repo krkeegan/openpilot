@@ -49,15 +49,15 @@ T_IDXS_LST = [index_function(idx, max_val=MAX_T, max_idx=N+1) for idx in range(N
 T_IDXS = np.array(T_IDXS_LST)
 T_DIFFS = np.diff(T_IDXS, prepend=[0.])
 MIN_ACCEL = -3.5
-T_REACT = 1.8
-MAX_BRAKE = 9.81
+T_REACT = 1.45
+COMFORT_BRAKE = 2.0
 
 
 def get_stopped_equivalence_factor(v_lead, t_react=T_REACT):
-  return t_react * v_lead + (v_lead*v_lead) / (2 * MAX_BRAKE)
+  return v_lead**2 / (2 * COMFORT_BRAKE) - t_react * v_lead
 
 def get_safe_obstacle_distance(v_ego, t_react=T_REACT):
-  return 2 * t_react * v_ego + (v_ego*v_ego) / (2 * MAX_BRAKE) + 4.0
+  return (v_ego*v_ego) / (2 * COMFORT_BRAKE) + (5.0 * (t_react/1.45))
 
 def desired_follow_distance(v_ego, v_lead, t_react=T_REACT):
   return get_safe_obstacle_distance(v_ego, t_react) - get_stopped_equivalence_factor(v_lead, t_react)
@@ -255,7 +255,7 @@ class LongitudinalMpc():
       self.solver.cost_set(i, 'Zl', Zl)
 
   def set_weights_for_xva_policy(self):
-    W = np.asfortranarray(np.diag([0., 10., 1., 10., 0.0, 1.]))
+    W = np.asfortranarray(np.diag([0., 10., 1., 10., 1.]))
     for i in range(N):
       self.solver.cost_set(i, 'W', W)
     # Setting the slice without the copy make the array not contiguous,
@@ -317,10 +317,10 @@ class LongitudinalMpc():
       # At slow speeds more time, decrease time up to 60mph
       # in mph ~= 5     10   15   20  25     30    35     40  45     50    55     60  65     70    75     80  85     90
       x_vel = [0, 2.25, 4.5, 6.75, 9, 11.25, 13.5, 15.75, 18, 20.25, 22.5, 24.75, 27, 29.25, 31.5, 33.75, 36, 38.25, 40.5]
-      y_dist = [1.37, 1.36, 1.32, 1.32, 1.32, 1.32, 1.32, 1.31, 1.29, 1.27, 1.24, 1.22, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2]
+      y_dist = [1.3, 1.28, 1.26, 1.24, 1.22, 1.20, 1.18, 1.16, 1.13, 1.11, 1.09, 1.07, 1.05, 1.05, 1.05, 1.05, 1.05, 1.05, 1.05]
       new_TR = np.interp(carstate.vEgo, x_vel, y_dist)
     elif carstate.distanceLines == 2: # Relaxed
-      new_TR = 1.5
+      new_TR = 1.3
     if new_TR != self.desired_TR:
       self.desired_TR = new_TR
       self.set_weights()
@@ -345,12 +345,12 @@ class LongitudinalMpc():
 
     # Fake an obstacle for cruise, this ensures smooth acceleration to set speed
     # when the leads are no factor.
-    cruise_lower_bound = v_ego + (3/4) * self.cruise_min_a * T_IDXS
-    cruise_upper_bound = v_ego + (3/4) * self.cruise_max_a * T_IDXS
+    v_lower = v_ego + (T_IDXS * self.cruise_min_a * 1.05)
+    v_upper = v_ego + (T_IDXS * self.cruise_max_a * 1.05)
     v_cruise_clipped = np.clip(v_cruise * np.ones(N+1),
-                               cruise_lower_bound,
-                               cruise_upper_bound)
-    cruise_obstacle = T_IDXS*v_cruise_clipped + get_safe_obstacle_distance(v_cruise_clipped, self.desired_TR)
+                               v_lower,
+                               v_upper)
+    cruise_obstacle = np.cumsum(T_DIFFS * v_cruise_clipped) + get_safe_obstacle_distance(v_cruise_clipped, self.desired_TR)
 
     x_obstacles = np.column_stack([lead_0_obstacle, lead_1_obstacle, cruise_obstacle])
     self.source = SOURCES[np.argmin(x_obstacles[0])]
