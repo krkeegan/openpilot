@@ -261,22 +261,22 @@ class CarInterface(CarInterfaceBase):
       set_long_tune(ret.longitudinalTuning, LongTunes.PEDAL)
     elif candidate in [CAR.COROLLA_TSS2, CAR.COROLLAH_TSS2, CAR.RAV4_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_NX_TSS2]:
       set_long_tune(ret.longitudinalTuning, LongTunes.TSS2)
-      ret.stoppingDecelRate = 0.3  # reach stopping target smoothly
-      ret.startingAccelRate = 6.0  # release brakes fast
+      # ret.stoppingDecelRate = 0.3  # reach stopping target smoothly
+      # ret.startingAccelRate = 6.0  # release brakes fast
       # Improved longitudinal tune settings from sshane
-      ret.longitudinalTuning.deadzoneBP = [0.]
-      ret.longitudinalTuning.deadzoneV = [0.]
-      ret.longitudinalTuning.kpV = [0.5, 0.5, 0.25]
-      ret.longitudinalTuning.kiBP = [0.]
-      ret.longitudinalTuning.kiV = [0.]
+      # ret.longitudinalTuning.deadzoneBP = [0.]
+      # ret.longitudinalTuning.deadzoneV = [0.]
+      # ret.longitudinalTuning.kpV = [0.5, 0.5, 0.25]
+      # ret.longitudinalTuning.kiBP = [0.]
+      # ret.longitudinalTuning.kiV = [0.]
       ret.vEgoStopping = 0.2  # car is near 0.1 to 0.2 when car starts requesting stopping accel
       ret.vEgoStarting = 0.2  # needs to be > or == vEgoStopping
       ret.startAccel = 0.0  # Toyota requests 0 instantly, then hands control off to some controller
       ret.stopAccel = -2.0  # Toyota requests -0.4 when stopped
       ret.stoppingDecelRate = 0.4  # reach stopping target smoothly - seems to take 0.5 seconds to go from 0 to -0.4
       ret.startingAccelRate = 20.  # release brakes fast
-      ret.longitudinalActuatorDelayLowerBound = 0.4 # KRKeegan bumping lag delays
-      ret.longitudinalActuatorDelayUpperBound = 0.4 # KRKeegan bumping lag delays
+      ret.longitudinalActuatorDelayLowerBound = 0.3
+      ret.longitudinalActuatorDelayUpperBound = 0.3
     else:
       set_long_tune(ret.longitudinalTuning, LongTunes.TSS)
 
