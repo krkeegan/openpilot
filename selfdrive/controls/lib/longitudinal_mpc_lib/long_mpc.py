@@ -57,7 +57,7 @@ def get_stopped_equivalence_factor(v_lead, t_react=T_REACT):
   return v_lead**2 / (2 * COMFORT_BRAKE) - t_react * v_lead
 
 def get_safe_obstacle_distance(v_ego, t_react=T_REACT):
-  return (v_ego*v_ego) / (2 * COMFORT_BRAKE) + (5.0 * (t_react/1.45))
+  return (v_ego*v_ego) / (2 * COMFORT_BRAKE) + 5.0 # I previously scaled this (5.0 * (t_react/T_REACT))
 
 def desired_follow_distance(v_ego, v_lead, t_react=T_REACT):
   return get_safe_obstacle_distance(v_ego, t_react) - get_stopped_equivalence_factor(v_lead, t_react)
@@ -232,14 +232,13 @@ class LongitudinalMpc():
 
   def set_weights_for_lead_policy(self):
     # KRKeegan adjustments to costs for different TRs
-    # these were calculated using the test_longitudial.py decleration tests
-    # All tests pass without any FCW.  Balance between J and D costs is
-    # a judgement call
-    # A TR below 1.2 will crash at 3+m/s^2 test with these settings
-    TRs = [1.2, 1.5, 1.8]
-    x_ego_obstacle_cost_multiplier = interp(self.desired_TR, TRs, [5.5, 2.75, 1.])
-    j_ego_cost_multiplier = interp(self.desired_TR, TRs, [.4, .7, 1.])
-    d_zone_cost_multiplier = interp(self.desired_TR, TRs, [4., 2., 1.])
+    # these were calculated using the test_longitudial.py deceleration tests
+    # All tests pass without changing any of the costs, but these small
+    # adjustments keep the stopping profile approximately in line with stock.
+    TRs = [1.0, 1.3, T_REACT]
+    x_ego_obstacle_cost_multiplier = interp(self.desired_TR, TRs, [1.6, 1.1, 1.])
+    j_ego_cost_multiplier = interp(self.desired_TR, TRs, [.6, .9, 1.])
+    d_zone_cost_multiplier = interp(self.desired_TR, TRs, [1.6, 1.1, 1.])
 
     W = np.asfortranarray(np.diag([X_EGO_OBSTACLE_COST * x_ego_obstacle_cost_multiplier, X_EGO_COST, V_EGO_COST, A_EGO_COST, A_CHANGE_COST, J_EGO_COST * j_ego_cost_multiplier]))
     for i in range(N):
