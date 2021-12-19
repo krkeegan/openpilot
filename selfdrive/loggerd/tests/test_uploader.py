@@ -52,7 +52,7 @@ class TestUploader(UploaderTestCase):
 
   def gen_files(self, lock=False, boot=True):
     f_paths = list()
-    for t in ["qlog", "rlog", "dcamera.hevc", "fcamera.hevc"]:
+    for t in ["qlog", "rlog", "dcamera.hevc", "fcamera.hevc", "ecamera.hevc"]:
       f_paths.append(self.make_file_with_data(self.seg_dir, t, 1, lock=lock))
 
     if boot:
@@ -66,6 +66,12 @@ class TestUploader(UploaderTestCase):
       keys += [f"boot/{self.seg_format2.format(i)}.bz2" for i in seg2]
     keys += [f"{self.seg_format.format(i)}/qlog.bz2" for i in seg1]
     keys += [f"{self.seg_format2.format(i)}/qlog.bz2" for i in seg2]
+    keys += [f"{self.seg_format.format(i)}/rlog.bz2" for i in seg1]
+    keys += [f"{self.seg_format2.format(i)}/rlog.bz2" for i in seg2]
+    for i in seg1:
+      keys += [f"{self.seg_format.format(i)}/{f}" for f in ['fcamera.hevc', 'dcamera.hevc', 'ecamera.hevc']]
+    for i in seg2:
+      keys += [f"{self.seg_format2.format(i)}/{f}" for f in ['fcamera.hevc', 'dcamera.hevc', 'ecamera.hevc']]
     return keys
 
   def test_upload(self):
