@@ -49,9 +49,11 @@ void Sound::update() {
 
   // scale volume with speed
   if (sm.updated("carState")) {
-    float volume = util::map_val(sm["carState"].getCarState().getVEgo(), 11.f, 20.f, 0.f, 1.0f);
+    float volume = util::map_val(sm["carState"].getCarState().getVEgo(), 11.f, 30.f, 0.f, 1.0f);  // KRKeegan max volume at ~65mph
     volume = QAudio::convertVolume(volume, QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
-    volume = util::map_val(volume, 0.f, 1.f, Hardware::MIN_VOLUME, Hardware::MAX_VOLUME);
+    float max_volume_scale = 0.7;  // KRKeegan percentage of default max volume
+    float min_volume_scale = 0.7;  // KRKeegan percentage of default min volume
+    volume = util::map_val(volume, 0.f, 1.f, Hardware::MIN_VOLUME * min_volume_scale, Hardware::MAX_VOLUME * max_volume_scale);
     for (auto &[s, loops] : sounds) {
       s->setVolume(std::round(100 * volume) / 100);
     }
