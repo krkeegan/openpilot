@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from cereal import car
+from common.numpy_fast import interp
 from selfdrive.config import Conversions as CV
 from selfdrive.car.toyota.tunes import LatTunes, LongTunes, set_long_tune, set_lat_tune
 from selfdrive.car.toyota.values import Ecu, CAR, TSS2_CAR, NO_DSU_CAR, MIN_ACC_SPEED, CarControllerParams
@@ -12,7 +13,15 @@ EventName = car.CarEvent.EventName
 class CarInterface(CarInterfaceBase):
   @staticmethod
   def get_pid_accel_limits(CP, current_speed, cruise_speed):
-    return CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX
+    # Same list of cars that TSS2 Long Tune Applies to below
+    if CP.carFingerprint in [CAR.COROLLA_TSS2, CAR.COROLLAH_TSS2, CAR.RAV4_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_NX_TSS2,
+                             CAR.HIGHLANDER_TSS2, CAR.HIGHLANDERH_TSS2, CAR.PRIUS_TSS2]:
+      # Allow for higher accel from PID controller at low speeds
+      return CarControllerParams.ACCEL_MIN, interp(current_speed,
+                                                   CarControllerParams.ACCEL_MAX_TSS2_BP,
+                                                   CarControllerParams.ACCEL_MAX_TSS2_VALS)
+    else:
+      return CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX
 
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=[]):  # pylint: disable=dangerous-default-value
