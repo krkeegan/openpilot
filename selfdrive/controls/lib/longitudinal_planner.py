@@ -16,8 +16,7 @@ from selfdrive.swaglog import cloudlog
 LON_MPC_STEP = 0.2  # first step is 0.2s
 AWARENESS_DECEL = -0.2  # car smoothly decel at .2m/s^2 when user is distracted
 A_CRUISE_MIN = -1.2
-A_CRUISE_MAX_VALS = [1.2, 1.2, 0.8, 0.6]  # Sets the limits of the planner accel, PID may exceed
-A_CRUISE_MAX_VALS_FOLLOWING = [1.6, 1.2, 0.8, 0.6]  # Allow for increased accel off the line
+A_CRUISE_MAX_VALS = [1.6, 1.2, 0.8, 0.6]  # Sets the limits of the planner accel, PID may exceed
 A_CRUISE_MAX_BP = [0., 15., 25., 40.]
 
 # Lookup table for turns
@@ -25,11 +24,8 @@ _A_TOTAL_MAX_V = [1.7, 3.2]
 _A_TOTAL_MAX_BP = [20., 40.]
 
 
-def get_max_accel(v_ego, following):
-  if following:
-    return interp(v_ego, A_CRUISE_MAX_BP, A_CRUISE_MAX_VALS_FOLLOWING)
-  else:
-    return interp(v_ego, A_CRUISE_MAX_BP, A_CRUISE_MAX_VALS)
+def get_max_accel(v_ego):
+  return interp(v_ego, A_CRUISE_MAX_BP, A_CRUISE_MAX_VALS)
 
 
 def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
@@ -83,9 +79,7 @@ class Planner:
     self.v_desired = max(0.0, self.v_desired)
 
     # Allow more acceleration from stop when behind a lead, necessary to compensate for sluggish toyota accel
-    lead_1 = sm['radarState'].leadOne
-    following = lead_1.status and lead_1.dRel < 45.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
-    accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego, following)]
+    accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
     accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
     if force_slow_decel:
       # if required so, force a smooth deceleration
