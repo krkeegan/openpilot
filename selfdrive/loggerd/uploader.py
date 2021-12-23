@@ -70,13 +70,16 @@ class Uploader():
 
     self.immediate_folders = ["crash/", "boot/"]
     self.immediate_priority = {"qlog.bz2": 0, "qcamera.ts": 1}
-    self.high_priority = {"rlog.bz2": 0, "fcamera.hevc": 1, "dcamera.hevc": 2, "ecamera.hevc": 3}
+    self.high_priority = {"rlog.bz2": 0}
+    self.normal_priority = {"fcamera.hevc": 1, "dcamera.hevc": 2, "ecamera.hevc": 3}
 
   def get_upload_sort(self, name):
     if name in self.immediate_priority:
       return self.immediate_priority[name]
     if name in self.high_priority:
       return self.high_priority[name] + 100
+    if name in self.normal_priority:
+      return self.normal_priority[name] + 300
     return 1000
 
   def list_upload_files(self):
@@ -129,6 +132,11 @@ class Uploader():
       # then upload the full log files, rear and front camera files
       for name, key, fn in upload_files:
         if name in self.high_priority:
+          return (key, fn)
+
+      # Could add a param here to disable full video uploads
+      for name, key, fn in upload_files:
+        if name in self.normal_priority:
           return (key, fn)
 
     return None
