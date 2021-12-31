@@ -230,17 +230,20 @@ class LongitudinalMpc():
     else:
       self.set_weights_for_lead_policy()
 
-  def set_weights_for_lead_policy(self):
+  def get_cost_multipliers(self):
+    TFs = [1.0, 1.25, T_FOLLOW]
     # KRKeegan adjustments to costs for different TFs
     # these were calculated using the test_longitudial.py deceleration tests
-    # All tests pass without changing any of the costs, but these small
-    # adjustments keep the stopping profile approximately in line with stock.
-    TFs = [1.0, 1.25, T_FOLLOW]
-    x_ego_obstacle_cost_multiplier = interp(self.desired_TF, TFs, [2, 1.3, 1.])
-    j_ego_cost_multiplier = interp(self.desired_TF, TFs, [.1, .8, 1.])
-    d_zone_cost_multiplier = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
+    x_ego_obstacle_cost_multiplier_tf = interp(self.desired_TF, TFs, [2., 1.3, 1.])
+    j_ego_cost_multiplier_tf = interp(self.desired_TF, TFs, [.1, .8, 1.])
+    d_zone_cost_multiplier_tf = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
+    return (x_ego_obstacle_cost_multiplier_tf, j_ego_cost_multiplier_tf, d_zone_cost_multiplier_tf)
 
-    W = np.asfortranarray(np.diag([X_EGO_OBSTACLE_COST * x_ego_obstacle_cost_multiplier, X_EGO_COST, V_EGO_COST, A_EGO_COST, A_CHANGE_COST, J_EGO_COST * j_ego_cost_multiplier]))
+  def set_weights_for_lead_policy(self):
+    cost_mulitpliers = self.get_cost_multipliers()
+    W = np.asfortranarray(np.diag([X_EGO_OBSTACLE_COST * cost_mulitpliers[0],
+                                   X_EGO_COST, V_EGO_COST, A_EGO_COST, A_CHANGE_COST,
+                                   J_EGO_COST * cost_mulitpliers[1]]))
     for i in range(N):
       W[4,4] = A_CHANGE_COST * np.interp(T_IDXS[i], [0.0, 1.0, 2.0], [1.0, 1.0, 0.0])
       self.solver.cost_set(i, 'W', W)
@@ -249,7 +252,7 @@ class LongitudinalMpc():
     self.solver.cost_set(N, 'W', np.copy(W[:COST_E_DIM, :COST_E_DIM]))
 
     # Set L2 slack cost on lower bound constraints
-    Zl = np.array([LIMIT_COST, LIMIT_COST, LIMIT_COST, DANGER_ZONE_COST * d_zone_cost_multiplier])
+    Zl = np.array([LIMIT_COST, LIMIT_COST, LIMIT_COST, DANGER_ZONE_COST * cost_mulitpliers[2]])
     for i in range(N):
       self.solver.cost_set(i, 'Zl', Zl)
 
@@ -311,21 +314,20 @@ class LongitudinalMpc():
     self.cruise_max_a = max_a
 
   def update_TF(self, carstate):
-    new_TF = T_FOLLOW
     if carstate.distanceLines == 1: # Traffic
       # At slow speeds more time, decrease time up to 60mph
       # in mph ~= 5     10   15   20  25     30    35     40  45     50    55     60  65     70    75     80  85     90
       x_vel = [0, 2.25, 4.5, 6.75, 9, 11.25, 13.5, 15.75, 18, 20.25, 22.5, 24.75, 27, 29.25, 31.5, 33.75, 36, 38.25, 40.5]
       y_dist = [1.25, 1.24, 1.23, 1.22, 1.21, 1.20, 1.18, 1.16, 1.13, 1.11, 1.09, 1.07, 1.05, 1.05, 1.05, 1.05, 1.05, 1.05, 1.05]
-      new_TF = np.interp(carstate.vEgo, x_vel, y_dist)
+      self.desired_TF = np.interp(carstate.vEgo, x_vel, y_dist)
     elif carstate.distanceLines == 2: # Relaxed
-      new_TF = 1.25
-    if new_TF != self.desired_TF:
-      self.desired_TF = new_TF
-      self.set_weights()
+      self.desired_TF = 1.25
+    else:
+      self.desired_TF = T_FOLLOW
 
   def update(self, carstate, radarstate, v_cruise, prev_accel_constraint=False):
     self.update_TF(carstate)
+    self.set_weights()
     v_ego = self.x0[1]
     a_ego = self.x0[2]
     self.status = radarstate.leadOne.status or radarstate.leadTwo.status
