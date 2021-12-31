@@ -14,7 +14,7 @@ else:
   # from pyextra.acados_template import AcadosOcpSolver as AcadosOcpSolverFast
   from selfdrive.controls.lib.longitudinal_mpc_lib.c_generated_code.acados_ocp_solver_pyx import AcadosOcpSolverFast  # pylint: disable=no-name-in-module, import-error
 
-from casadi import SX, vertcat
+from casadi import SX, vertcat, if_else
 
 LONG_MPC_DIR = os.path.dirname(os.path.abspath(__file__))
 EXPORT_DIR = os.path.join(LONG_MPC_DIR, "c_generated_code")
@@ -53,14 +53,20 @@ T_FOLLOW = 1.45
 COMFORT_BRAKE = 2.5
 STOP_DISTANCE = 6.0
 
-def get_stopped_equivalence_factor(v_lead, t_follow=T_FOLLOW):
-  return (v_lead**2) / (2 * COMFORT_BRAKE)
+def get_stopped_equivalence_factor(v_lead, v_ego, t_follow=T_FOLLOW):
+  # KRK add linear offset based on speed differential in attempt to
+  # rectify sluggish start issue
+  v_diff_offset = if_else(v_lead - v_ego > 0, (v_lead - v_ego) * 1, 0)  # Linear offset
+  v_diff_offset = if_else(v_diff_offset > STOP_DISTANCE, STOP_DISTANCE, v_diff_offset) # Limit max offset
+  v_diff_offset = v_diff_offset * ((10 - v_ego)/10)  # Offset tapers off ending at v_ego of 10m/s
+  distance = (v_lead**2) / (2 * COMFORT_BRAKE) + v_diff_offset
+  return distance
 
 def get_safe_obstacle_distance(v_ego, t_follow=T_FOLLOW):
   return (v_ego**2) / (2 * COMFORT_BRAKE) + t_follow * v_ego + STOP_DISTANCE
 
 def desired_follow_distance(v_ego, v_lead, t_follow=T_FOLLOW):
-  return get_safe_obstacle_distance(v_ego, t_follow) - get_stopped_equivalence_factor(v_lead, t_follow)
+  return get_safe_obstacle_distance(v_ego, t_follow) - get_stopped_equivalence_factor(v_lead, v_ego, t_follow)
 
 
 def gen_long_model():
@@ -231,13 +237,22 @@ class LongitudinalMpc():
       self.set_weights_for_lead_policy()
 
   def get_cost_multipliers(self):
+    v_ego = self.x0[1]
+    v_ego_bps = [0, 10]
     TFs = [1.0, 1.25, T_FOLLOW]
     # KRKeegan adjustments to costs for different TFs
     # these were calculated using the test_longitudial.py deceleration tests
     x_ego_obstacle_cost_multiplier_tf = interp(self.desired_TF, TFs, [2., 1.3, 1.])
     j_ego_cost_multiplier_tf = interp(self.desired_TF, TFs, [.1, .8, 1.])
     d_zone_cost_multiplier_tf = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
-    return (x_ego_obstacle_cost_multiplier_tf, j_ego_cost_multiplier_tf, d_zone_cost_multiplier_tf)
+    # KRKeegan adjustments to improve sluggish acceleration these also
+    # alter deceleration in the same range
+    x_ego_obstacle_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [2., 1.])  # double
+    j_ego_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [.5, 1.])  # halve
+    # Select the appropriate min/max of the options
+    x_ego_obstacle_cost_multiplier = max(x_ego_obstacle_cost_multiplier_tf, x_ego_obstacle_cost_multiplier_v_ego)
+    j_ego_cost_multiplier = min(j_ego_cost_multiplier_tf, j_ego_cost_multiplier_v_ego)
+    return (x_ego_obstacle_cost_multiplier, j_ego_cost_multiplier, d_zone_cost_multiplier_tf)
 
   def set_weights_for_lead_policy(self):
     cost_mulitpliers = self.get_cost_multipliers()
@@ -342,8 +357,8 @@ class LongitudinalMpc():
     # To estimate a safe distance from a moving lead, we calculate how much stopping
     # distance that lead needs as a minimum. We can add that to the current distance
     # and then treat that as a stopped car/obstacle at this new distance.
-    lead_0_obstacle = lead_xv_0[:,0] + get_stopped_equivalence_factor(lead_xv_0[:,1], self.desired_TF)
-    lead_1_obstacle = lead_xv_1[:,0] + get_stopped_equivalence_factor(lead_xv_1[:,1], self.desired_TF)
+    lead_0_obstacle = lead_xv_0[:,0] + get_stopped_equivalence_factor(lead_xv_0[:,1], v_ego, self.desired_TF)
+    lead_1_obstacle = lead_xv_1[:,0] + get_stopped_equivalence_factor(lead_xv_1[:,1], v_ego, self.desired_TF)
 
     # Fake an obstacle for cruise, this ensures smooth acceleration to set speed
     # when the leads are no factor.
