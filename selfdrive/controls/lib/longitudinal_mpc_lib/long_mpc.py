@@ -234,7 +234,13 @@ class LongitudinalMpc():
     if self.e2e:
       self.set_weights_for_xva_policy()
     else:
-      self.set_weights_for_lead_policy()
+      self.set_weights_for_lead_policy(update=False)
+
+  def update_weights(self):
+    if self.e2e:
+      self.set_weights_for_xva_policy()
+    else:
+      self.set_weights_for_lead_policy(update=True)
 
   def get_cost_multipliers(self):
     v_ego = self.x0[1]
@@ -247,20 +253,21 @@ class LongitudinalMpc():
     d_zone_cost_multiplier_tf = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
     # KRKeegan adjustments to improve sluggish acceleration these also
     # alter deceleration in the same range
-    x_ego_obstacle_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [2., 1.])  # double
     j_ego_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [.5, 1.])  # halve
+    a_change_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [.5, 1.])  # halve
     # Select the appropriate min/max of the options
-    x_ego_obstacle_cost_multiplier = max(x_ego_obstacle_cost_multiplier_tf, x_ego_obstacle_cost_multiplier_v_ego)
     j_ego_cost_multiplier = min(j_ego_cost_multiplier_tf, j_ego_cost_multiplier_v_ego)
-    return (x_ego_obstacle_cost_multiplier, j_ego_cost_multiplier, d_zone_cost_multiplier_tf)
+    return (x_ego_obstacle_cost_multiplier_tf, j_ego_cost_multiplier, d_zone_cost_multiplier_tf, a_change_cost_multiplier_v_ego)
 
-  def set_weights_for_lead_policy(self):
+  def set_weights_for_lead_policy(self, update=False):
     cost_mulitpliers = self.get_cost_multipliers()
     W = np.asfortranarray(np.diag([X_EGO_OBSTACLE_COST * cost_mulitpliers[0],
-                                   X_EGO_COST, V_EGO_COST, A_EGO_COST, A_CHANGE_COST,
+                                   X_EGO_COST, V_EGO_COST, A_EGO_COST, A_CHANGE_COST * cost_mulitpliers[3],
                                    J_EGO_COST * cost_mulitpliers[1]]))
     for i in range(N):
-      W[4,4] = A_CHANGE_COST * np.interp(T_IDXS[i], [0.0, 1.0, 2.0], [1.0, 1.0, 0.0])
+      if not update:
+        # Do not reset A_Change on update
+        W[4,4] = A_CHANGE_COST * np.interp(T_IDXS[i], [0.0, 1.0, 2.0], [1.0, 1.0, 0.0])
       self.solver.cost_set(i, 'W', W)
     # Setting the slice without the copy make the array not contiguous,
     # causing issues with the C interface.
@@ -342,7 +349,7 @@ class LongitudinalMpc():
 
   def update(self, carstate, radarstate, v_cruise, prev_accel_constraint=False):
     self.update_TF(carstate)
-    self.set_weights()
+    self.update_weights()
     v_ego = self.x0[1]
     a_ego = self.x0[2]
     self.status = radarstate.leadOne.status or radarstate.leadTwo.status
