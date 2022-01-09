@@ -51,7 +51,7 @@ T_DIFFS = np.diff(T_IDXS, prepend=[0.])
 MIN_ACCEL = -3.5
 T_FOLLOW = 1.45
 COMFORT_BRAKE = 2.5
-STOP_DISTANCE = 6.0
+STOP_DISTANCE = 5.5
 
 def get_stopped_equivalence_factor(v_lead, v_ego, t_follow=T_FOLLOW):
   # KRKeegan this offset rapidly decreases the following distance when the lead pulls
@@ -253,8 +253,8 @@ class LongitudinalMpc():
     d_zone_tf = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
     # KRKeegan adjustments to improve sluggish acceleration these also
     # alter deceleration in the same range
-    j_ego_v_ego = interp(v_ego, v_ego_bps, [.1, 1.])
-    a_change_v_ego = interp(v_ego, v_ego_bps, [.1, 1.])
+    j_ego_v_ego = interp(v_ego, v_ego_bps, [.05, 1.])
+    a_change_v_ego = interp(v_ego, v_ego_bps, [.05, 1.])
     # Select the appropriate min/max of the options
     j_ego = min(j_ego_tf, j_ego_v_ego)
     return (x_ego_tf, j_ego, d_zone_tf, a_change_v_ego)
