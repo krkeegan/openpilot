@@ -288,7 +288,7 @@ class CarInterface(CarInterfaceBase):
       ret.startAccel = 0.0  # Toyota requests 0 instantly, then hands control off to some controller
       ret.stopAccel = -2.0  # Toyota requests -0.4 when stopped
       ret.stoppingDecelRate = 0.4  # reach stopping target smoothly - seems to take 0.5 seconds to go from 0 to -0.4
-      ret.startingAccelRate = 20.  # release brakes fast
+      ret.startingAccelRate = 200.  # Go to zero from stopAccel immediately
       ret.longitudinalActuatorDelayLowerBound = 0.3
       ret.longitudinalActuatorDelayUpperBound = 0.3
     else:
