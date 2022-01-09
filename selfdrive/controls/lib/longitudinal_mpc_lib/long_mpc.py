@@ -248,16 +248,16 @@ class LongitudinalMpc():
     TFs = [1.0, 1.25, T_FOLLOW]
     # KRKeegan adjustments to costs for different TFs
     # these were calculated using the test_longitudial.py deceleration tests
-    x_ego_obstacle_cost_multiplier_tf = interp(self.desired_TF, TFs, [2., 1.3, 1.])
-    j_ego_cost_multiplier_tf = interp(self.desired_TF, TFs, [.1, .8, 1.])
-    d_zone_cost_multiplier_tf = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
+    x_ego_tf = interp(self.desired_TF, TFs, [2., 1.3, 1.])
+    j_ego_tf = interp(self.desired_TF, TFs, [.1, .8, 1.])
+    d_zone_tf = interp(self.desired_TF, TFs, [1.8, 1.3, 1.])
     # KRKeegan adjustments to improve sluggish acceleration these also
     # alter deceleration in the same range
-    j_ego_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [.1, 1.])
-    a_change_cost_multiplier_v_ego = interp(v_ego, v_ego_bps, [.1, 1.])
+    j_ego_v_ego = interp(v_ego, v_ego_bps, [.1, 1.])
+    a_change_v_ego = interp(v_ego, v_ego_bps, [.1, 1.])
     # Select the appropriate min/max of the options
-    j_ego_cost_multiplier = min(j_ego_cost_multiplier_tf, j_ego_cost_multiplier_v_ego)
-    return (x_ego_obstacle_cost_multiplier_tf, j_ego_cost_multiplier, d_zone_cost_multiplier_tf, a_change_cost_multiplier_v_ego)
+    j_ego = min(j_ego_tf, j_ego_v_ego)
+    return (x_ego_tf, j_ego, d_zone_tf, a_change_v_ego)
 
   def set_weights_for_lead_policy(self):
     cost_mulitpliers = self.get_cost_multipliers()
