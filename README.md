@@ -1,9 +1,9 @@
-Warning
+WARNING
 ------
 
 **USE OF ANY CODE IN THIS REPOSITORY IS AT YOUR OWN RISK.  See Waiver Below**
 
-**I AM NOT A SOFTWARE ENGINEER AND HAVE NO FORMAL EXPERIENCE WITH ANY OF THIS.  THERE ARE BUGS AND ERRORS IN THIS CODE WHICH IS AT BEST ALPHA QUALITY SOFTWARE AND SHOULD ONLY BE USED FOR RESEARCH PURPOSES. THIS IS NOT A PRODUCT. YOU ARE RESPONSIBLE FOR COMPLYING WITH LOCAL LAWS AND REGULATIONS. NO WARRANTY EXPRESSED OR IMPLIED.**
+**I AM NOT A SOFTWARE ENGINEER AND HAVE NO FORMAL TRAINING OR EXPERIENCE WITH ANY OF THIS.  THERE ARE BUGS AND ERRORS IN THIS CODE WHICH IS AT BEST ALPHA QUALITY SOFTWARE AND SHOULD ONLY BE USED FOR RESEARCH PURPOSES. THIS IS NOT A PRODUCT. YOU ARE RESPONSIBLE FOR COMPLYING WITH LOCAL LAWS AND REGULATIONS. NO WARRANTY EXPRESSED OR IMPLIED.**
 
 **You must keep your eyes on the road at all times and be ready to take control of the car at any point.**
 
@@ -28,16 +28,24 @@ What is openpilot?
 
 What is in this fork?
 ------
-This is my personal fork of openpilot that includes modifications that I want and nothing else.  I drive a __2019 Rav4 Hybrid (TSS2)__ most of the modifications will only work on my vehicle type.
+This is my personal fork of openpilot that includes modifications that I want and nothing else.  I drive a __2019 Rav4 Hybrid (TSS2)__ most of the modifications were designed for my vehicle and my personal taste and may not work on other vehicles.
 
-I am publishing this work to help others understand how openpilot works.  As such, __I am NOT providing support for installation or troubleshooting.__  If you are looking for a supported fork, I recommend [Shane's Stock Additions](https://github.com/sshane/openpilot) fork.
+I am publishing this work to help others understand how openpilot works.  As such, __I am NOT providing support for installation or troubleshooting.__  If you are looking for a supported fork, I recommend [Shane's Stock Additions](https://github.com/sshane/openpilot) fork.  It contains many of the same features.
 
 Currently this fork contains the following modifications:
-* 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.  
-  * These profiles are a modified version of Shane's profiles.  See below.
+* 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.
+  * These profiles are described below.
   * There are no on screen messages regarding the distance profile selected, only the icons on the vehicle's HUD.
 * Toggle disengage on gas from the settings->toggles screen
 * Updates are permanently disabled and must be performed using `ssh` and `git`.
+* Raw toggle added back in to enable automatic log uploading.
+* Lower volume to 70%
+* Improve the starting acceleration off the line.  See below
+* Specific tuning for my vehicle and my tastes.
+  * Tweaks deal with the laggy acceleration response on toyotas
+  * Higher acceleration limit at low speed, lower limit at high speed
+  * Decrease `a_change_cost` timescale to be closer to toyota lag values
+* Other features from future versions of Openpilot as I see fit
 
 Will you add something?
 ---
@@ -47,31 +55,38 @@ You can certainly ask, but the criteria for adding it is:
 * Is it something I consider safe?  I am pretty cautious.
 * Is it easy to maintain?  I don't want this to be a chore to maintain.
 
-If the answer to any of those is __no__, then I probably won't add it. 
+If the answer to any of those is __no__, then I probably won't add it.
 
 Distance Profiles
 ---
-Shane's profiles were not quite to my liking.  First, I extrapolated out the speeds, so that the distance is set about every ~5mph.  This just makes it easier to edit.
+I extrapolated out the speeds, so that the distance is set about every ~5mph.  This just makes it easier to edit.
 
-* Stock - Unchanged, this uses the default settings in openpilot.
-* Relaxed - I felt Shane's had barely any noticable difference over stock.  I modified mine to be a 1.5 second following distance across the entire range.  Below ~25 mph this about matches Shane's, above this speed it is a bit closer.  This largely falls halfway between stock and traffic.
-* Traffic - At low speeds this feels about right.  But at high speeds, I did not like that it continued to decrease the following distance. Instead, after ~60mph the traffic profile becomes fixed to 1.2 seconds.
-  * I particularly don't like the hump that occurs around 68mph - 78mph.  I think this could result non-ideal outcomes.
-
-![Follow Distance Graphs](https://user-images.githubusercontent.com/3046315/139732674-9e3c402e-28fd-421a-976f-d0691b079565.png)
+* Stock - Unchanged, this uses the default settings in openpilot with follow time of 1.45s.
+* Relaxed - This is set to 1.25s across the board.
+* Traffic - At low speeds this is set to 1.25s and gradually drops down to 1.05s at freeway speeds.
 
 Distance Profile Cost Adjustments
 ---
-As the following distance decreases I have decreased the `jerk` cost and increased the `danger` cost.  This is to be expected, as the follow distance decreases the allowable rate of change in deceleration has to increase, this will make the acceleration more jerky.  Below is an example of this, as you can see the relaxed and traffic profiles start off following the lead closer, and then when the lead starts to slow down, they increase their rate of deceleration much faster:
+As the following distance decreases I have decreased the `jerk` and `a_change` costs and increased the `danger` cost.  This is to be expected, as the follow distance decreases the allowable rate of change in deceleration has to increase, this will make the acceleration more jerky.  Below is an example of this, as you can see the relaxed and traffic profiles start off following the lead closer, and then when the lead starts to slow down, they increase their rate of deceleration much faster:
 
-![deceleration compared](https://user-images.githubusercontent.com/3046315/140407268-9af20805-b07b-425b-a56f-7fa528846c23.png)
+![deceleration compared](https://user-images.githubusercontent.com/3046315/148848058-01d3b410-79c2-409a-ab5c-336f21ef8fd9.png)
+
+Improve Acceleration from Stop
+---
+The new MPC introduced in 8.10 has a much slower acceleration profile from a standstill.  This is caused by many things, but is largely driven by the `a_change_cost` which was introduced as part of the lag compensation.  As you can see below, the rate of acceleration significantly lags behind 8.9:
+
+![8.9 v 8.12](https://user-images.githubusercontent.com/3046315/148848373-7737a46e-a547-48f2-88ec-c2861d42e1ee.png)
+
+I have made adjustments to the `jerk` and `a_change` costs to allow for a faster change in acceleration at low speeds, this affects both acceleration and deceleration.  I also reduced the `STOP_DISTANCE` dynamically so that when the lead car pulls away, the MPC is told to maintain a closer distance, this helps cause the an earlier initial acceleration request.  The changes result in the improved profile seen below:
+
+![8.12 v KRK](https://user-images.githubusercontent.com/3046315/148849415-2212361b-4bde-43c2-8f12-bbcdf6d833dd.png)
 
 Development Process
 ---
 
 The comma.ai repository is a [complicated beast](https://blog.comma.ai/a-2020-theme-externalization/).  The releases are are compiled stripped down repositories.  I prefer to base my daily driver fork `Rav4-TSS2` off of the `commaai/devel` branch.  However, this branch lacks the suite of automated tests.  So I create my development branches off of `commaai/master`.  I try to pick the commit that is closest to the release version and make a branch `master-x.xx` with x.xx being the release version number.
 
-My branches that start with `feature_` contain additional features or tweaks that have not been upstreamed into `commaai/master`.  My branches that start with `upstream_` contain commits that have been developed by `commaai` but were not included in the last release and are likely to be included in the next release.
+To make merging with future versions of Openpilot easier, I try to keep each "feature" on its own branch. My branches that start with `feature_` contain additional features or tweaks that have not been upstreamed into `commaai/master`.  My branches that start with `upstream_` contain commits that have been developed by `commaai` but were not included in the last release and are likely to be included in the next release.
 
 Once I am satisfied with a branch and it has passed the automated tests, or failed for understandable reasons, I cherry-pick the commits into `Rav4-TSS2`.  Sometimed I may create a `Rav4-TSS2-____` branch if I want to test changes in the vehicle before commiting them to my daily driver branch.
 
