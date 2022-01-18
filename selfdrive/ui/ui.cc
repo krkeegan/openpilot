@@ -182,6 +182,14 @@ static void update_state(UIState *s) {
 
     scene.light_sensor = std::clamp<float>(1.0 - (ev / max_ev), 0.0, 1.0);
   }
+  if (sm.updated("wideRoadCameraState") && Hardware::TICI()) {
+    auto wide_camera_state = sm["wideRoadCameraState"].getWideRoadCameraState();
+
+    float max_ev = 1904 * 10.0 / 6;
+    float ev = wide_camera_state.getGain() * float(wide_camera_state.getIntegLines());
+
+    scene.wide_light_sensor = std::clamp<float>(1.0 - (ev / max_ev), 0.0, 1.0);
+  }
   scene.started = sm["deviceState"].getDeviceState().getStarted() && scene.ignition;
 }
 
@@ -222,6 +230,7 @@ QUIState::QUIState(QObject *parent) : QObject(parent) {
   ui_state.sm = std::make_unique<SubMaster, const std::initializer_list<const char *>>({
     "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "roadCameraState",
     "pandaStates", "carParams", "driverMonitoringState", "sensorEvents", "carState", "liveLocationKalman",
+    "wideRoadCameraState",
   });
 
   Params params;
@@ -278,7 +287,11 @@ void Device::updateBrightness(const UIState &s) {
   float clipped_brightness = BACKLIGHT_OFFROAD;
   if (s.scene.started) {
     // Scale to 0% to 100%
-    clipped_brightness = 100.0 * s.scene.light_sensor;
+    if(Hardware::TICI()){
+      clipped_brightness = 100.0 * s.scene.wide_light_sensor;
+    } else{
+      clipped_brightness = 100.0 * s.scene.light_sensor;
+    }
 
     // CIE 1931 - https://www.photonstophotos.net/GeneralTopics/Exposure/Psychometric_Lightness_and_Gamma.htm
     if (clipped_brightness <= 8) {
