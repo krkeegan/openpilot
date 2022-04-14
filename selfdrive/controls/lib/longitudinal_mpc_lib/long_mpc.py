@@ -349,7 +349,7 @@ class LongitudinalMpc:
     else:
       self.desired_TF = T_FOLLOW
 
-  def update(self, carstate, radarstate, v_cruise):
+  def update(self, carstate, radarstate, v_cruise, prev_accel_constraint=True):
     self.update_TF(carstate)
 
     v_ego = self.x0[1]
@@ -359,7 +359,7 @@ class LongitudinalMpc:
     lead_xv_1 = self.process_lead(radarstate.leadTwo)
 
     # Use the processed leads which always have a velocity
-    self.set_weights(v_lead0=lead_xv_0[0,1], v_lead1=lead_xv_1[0,1])
+    self.set_weights(prev_accel_constraint=prev_accel_constraint, v_lead0=lead_xv_0[0,1], v_lead1=lead_xv_1[0,1])
 
     # set accel limits in params
     self.params[:,0] = interp(float(self.status), [0.0, 1.0], [self.cruise_min_a, MIN_ACCEL])
