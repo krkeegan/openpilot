@@ -17,6 +17,9 @@ class Maneuver():
     self.only_lead2 = kwargs.get("only_lead2", False)
     self.only_radar = kwargs.get("only_radar", False)
 
+    # KRKeegan allow testing distance_lines
+    self.distance_lines = kwargs.get("distance_lines", 0)
+
     self.duration = duration
     self.title = title
 
@@ -26,7 +29,8 @@ class Maneuver():
       speed=self.speed,
       distance_lead=self.distance_lead,
       only_lead2=self.only_lead2,
-      only_radar=self.only_radar
+      only_radar=self.only_radar,
+      distance_lines=self.distance_lines
     )
 
     valid = True
