@@ -65,6 +65,37 @@ maneuvers = [
     cruise_values=[20., 20., 20.],
     breakpoints=[2., 2.01, 8.8],
   ),
+  # Currently the distance button does nothing in e2e mode.
+  # So the two following tests are misleading in e2e mode, as they start with the
+  # distance behind the lead being less than e2e would actually achieve. While not
+  # altering the cost function like we do for acc mode.
+  # That said, it doesn't crash, it just gets slightly closer at the final stop
+  # than e2e does normally.  The e2e planner does result in less final stopped
+  # distance.
+  Maneuver(
+    'distance_lines=2, lead distance 32m, steady state following a car at 20m/s, then lead decel to 0mph at 3+m/s^2',
+    duration=40.,
+    initial_speed=20.,
+    lead_relevancy=True,
+    initial_distance_lead=32.,
+    speed_lead_values=[20., 20., 0.],
+    prob_lead_values=[1., 1., 1.],
+    cruise_values=[21., 21., 21.],
+    breakpoints=[2., 2.01, 8.51],
+    distance_lines=2
+  ),
+  Maneuver(
+    'distance_lines=1, lead distance 28.4m, steady state following a car at 20m/s, then lead decel to 0mph at 3+m/s^2',
+    duration=40.,
+    initial_speed=20.,
+    lead_relevancy=True,
+    initial_distance_lead=28.4,
+    speed_lead_values=[20., 20., 0.],
+    prob_lead_values=[1., 1., 1.],
+    cruise_values=[21., 21., 21.],
+    breakpoints=[2., 2.01, 8.51],
+    distance_lines=1
+  ),
   Maneuver(
     "approach stopped car at 20m/s, with prob_lead_values",
     duration=30.,
