@@ -1,6 +1,7 @@
 import copy
 
 from cereal import car
+from openpilot.common.params import Params, put_nonblocking
 from openpilot.common.conversions import Conversions as CV
 from openpilot.common.numpy_fast import mean
 from openpilot.common.filter_simple import FirstOrderFilter
@@ -43,6 +44,13 @@ class CarState(CarStateBase):
     self.low_speed_lockout = False
     self.acc_type = 1
     self.lkas_hud = {}
+
+    # KRKeegan - Add support for toyota distance button
+    self.distance_btn = 0
+    self.prev_distance_btn = 0
+    self.distance_send = 0
+    self.distance_send_counter = 0
+    self.params = Params()
 
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
@@ -131,6 +139,28 @@ class CarState(CarStateBase):
       if not (self.CP.flags & ToyotaFlags.SMART_DSU.value):
         self.acc_type = cp_acc.vl["ACC_CONTROL"]["ACC_TYPE"]
       ret.stockFcw = bool(cp_acc.vl["PCS_HUD"]["FCW"])
+
+    if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
+      self.distance_btn = 1 if cp_cam.vl["ACC_CONTROL"]["DISTANCE"] == 1 else 0
+      try:
+        op_distance = int(self.params.get('LongitudinalPersonality'))
+      except (ValueError, TypeError):
+        op_distance = 2
+
+      if self.prev_distance_btn and not self.distance_btn:
+        # Update on release of button. Sunny checks if less than 50 frames not sure why
+        # maybe he has another feature if you hold button?
+        op_distance = op_distance - 1
+        op_distance = 2 if op_distance < 0 or op_distance > 2 else op_distance
+        put_nonblocking("LongitudinalPersonality", str(op_distance))
+      self.prev_distance_btn = self.distance_btn
+
+      if (int(cp.vl["PCM_CRUISE_SM"]["DISTANCE_LINES"]) -1) != op_distance and self.distance_send_counter < 10:
+          self.distance_send = 1
+          self.distance_send_counter += 1
+      else:
+        self.distance_send = 0
+        self.distance_send_counter += 0
 
     # some TSS2 cars have low speed lockout permanently set, so ignore on those cars
     # these cars are identified by an ACC_TYPE value of 2.
