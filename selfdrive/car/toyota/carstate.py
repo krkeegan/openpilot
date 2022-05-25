@@ -27,6 +27,9 @@ class CarState(CarStateBase):
     self.low_speed_lockout = False
     self.acc_type = 1
 
+    # KRKeegan - Add support for toyota distance button
+    self.distance_btn = 0
+
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
 
@@ -110,6 +113,16 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint in (TSS2_CAR | RADAR_ACC_CAR):
       self.acc_type = cp_acc.vl["ACC_CONTROL"]["ACC_TYPE"]
       ret.stockFcw = bool(cp_acc.vl["ACC_HUD"]["FCW"])
+
+    if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
+      # KRKeegan - Add support for toyota distance button
+      self.distance_btn = 1 if cp_cam.vl["ACC_CONTROL"]["DISTANCE"] == 1 else 0
+      ret.distanceLines = cp.vl["PCM_CRUISE_SM"]["DISTANCE_LINES"]
+
+    if self.CP.carFingerprint in RADAR_ACC_CAR:
+      # KRKeegan - Add support for toyota distance button these cars have the acc_control on car can
+      self.distance_btn = 1 if cp.vl["ACC_CONTROL"]["DISTANCE"] == 1 else 0
+      ret.distanceLines = cp.vl["PCM_CRUISE_SM"]["DISTANCE_LINES"]
 
     # some TSS2 cars have low speed lockout permanently set, so ignore on those cars
     # these cars are identified by an ACC_TYPE value of 2.
@@ -236,6 +249,9 @@ class CarState(CarStateBase):
         ("ACC_HUD", 1),
       ]
 
+      # KRKeegan - Add support for toyota distance button
+      signals.append(("DISTANCE", "ACC_CONTROL", 0))
+
     if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu:
       signals += [
         ("FORCE", "PRE_COLLISION"),
@@ -244,6 +260,10 @@ class CarState(CarStateBase):
       checks += [
         ("PRE_COLLISION", 33),
       ]
+
+    # KRKeegan - Add support for toyota distance button
+    if CP.carFingerprint in (TSS2_CAR | RADAR_ACC_CAR):
+      signals.append(("DISTANCE_LINES", "PCM_CRUISE_SM"))
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
@@ -264,5 +284,8 @@ class CarState(CarStateBase):
         ("ACC_CONTROL", 33),
         ("ACC_HUD", 1),
       ]
+
+      # KRKeegan - Add support for toyota distance button
+      signals.append(("DISTANCE", "ACC_CONTROL", 0))
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)
