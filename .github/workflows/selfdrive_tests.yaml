@@ -272,7 +272,11 @@ jobs:
     - name: Run replay
       run: |
         ${{ env.RUN }} "scons -j$(nproc) && \
-                        CI=1 coverage run selfdrive/test/process_replay/test_processes.py -j$(nproc) --ignore-fields carState.distanceLines --ignore-msgs longitudinalPlan && \
+                        CI=1 coverage run selfdrive/test/process_replay/test_processes.py -j$(nproc) \
+                        --ignore-fields carState.distanceLines \
+                        carControl.actuators.accel carControl.actuatorsOutput.accel \
+                        controlsState.ufAccelCmd \
+                        --ignore-msgs longitudinalPlan sendcan && \
                         coverage xml"
     - name: Print diff
       if: always()
