@@ -101,6 +101,9 @@ class CarState(CarStateBase):
       self.acc_type = cp_cam.vl["ACC_CONTROL"]["ACC_TYPE"]
       ret.stockFcw = bool(cp_cam.vl["ACC_HUD"]["FCW"])
 
+    # Toyota 5/5 Speed Increments by AleSato
+    self.Fast_Speed_Increments = 2 if Params().get_bool('Change5speed') else 1
+
     # some TSS2 cars have low speed lockout permanently set, so ignore on those cars
     # these cars are identified by an ACC_TYPE value of 2.
     # TODO: it is possible to avoid the lockout and gain stop and go if you
