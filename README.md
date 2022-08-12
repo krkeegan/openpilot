@@ -14,6 +14,8 @@ WARNING
 - [What is openpilot?](#what-is-openpilot)
 - [What is in this fork?](#what-is-in-this-fork)
 - [Features](#features)
+  - [Abandoned Features](#abandoned-features)
+  - [Previous Features that have been Merged into Comma Repo:](#previous-features-that-have-been-merged-into-comma-repo)
 - [Will you add something?](#will-you-add-something)
 - [Distance Profiles](#distance-profiles)
 - [Distance Profile Cost Adjustments](#distance-profile-cost-adjustments)
@@ -42,7 +44,6 @@ Currently this fork contains the following modifications:
   * These profiles are described below.
   * There are no on screen messages regarding the distance profile selected, only the icons on the vehicle's HUD.
 * Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
-* Raw toggle added back in to enable automatic log uploading. [Feature Raw Logs](https://github.com/krkeegan/openpilot/tree/feature_raw_logs_upload)
 * Lower volume to 70% [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
 * Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
 * Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
@@ -51,7 +52,11 @@ Currently this fork contains the following modifications:
   * Decrease `a_change_cost` timescale to be closer to toyota lag values
 * Other features from future versions of Openpilot as I see fit
 
-Previous Features that have been Merged into Comma Repo:
+### Abandoned Features
+* Raw toggle added back in to enable automatic log uploading. [Feature Raw Logs](https://github.com/krkeegan/openpilot/tree/feature_raw_logs_upload)
+  * Comma blocks the upload of full camera and log files from the device with an http 412 error.  I suspect they are trying to save money on bandwidth costs.  I think the block tirggered when a device authentication is used, so presumably you could get around this by generating and copying a new authentication to the device.  However I elected to use the API and have a little script that fires off whenever my device is seen on my home network.
+
+### Previous Features that have been Merged into Comma Repo:
 * Display blue barriers when openpilot is engaged.
 * Use wide camera for light sensor, better night performance.
 * Toggle Disengage on Gas. (Openpilot adopted in 8.14)
