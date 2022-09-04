@@ -13,6 +13,7 @@ ButtonType = car.CarState.ButtonEvent.Type
 FrogPilotButtonType = custom.FrogPilotCarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
 SteerControlType = car.CarParams.SteerControlType
+GearShifter = car.CarState.GearShifter
 
 class CarInterface(CarInterfaceBase):
   @staticmethod
@@ -177,7 +178,7 @@ class CarInterface(CarInterfaceBase):
       ]
 
     # events
-    events = self.create_common_events(ret)
+    events = self.create_common_events(ret, extra_gears=[GearShifter.sport])
 
     # Lane Tracing Assist control is unavailable (EPS_STATUS->LTA_STATE=0) until
     # the more accurate angle sensor signal is initialized
