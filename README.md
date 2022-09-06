@@ -40,27 +40,35 @@ I am publishing this work to help others understand how openpilot works.  As suc
 Features
 ------
 Currently this fork contains the following modifications:
-* 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.  [Feature Toyota Distance Button](https://github.com/krkeegan/openpilot/tree/feature_toyota_distance_btn)
+* __Follow Distance Profiles__ - 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.  [Feature Toyota Distance Button](https://github.com/krkeegan/openpilot/tree/feature_toyota_distance_btn)
   * These profiles are described below.
   * There are no on screen messages regarding the distance profile selected, only the icons on the vehicle's HUD.
-* Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
-* Lower volume to 70% [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
-* Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
-* Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
+* __Disable Updates and Nags__ - Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
+* __Decrease Volume__ - Lower volume to 70% [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
+* __No More Sluggish Starts__ - Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
+* __Small Toyota Tweaks__ - Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
   * Tweaks deal with the laggy acceleration response on toyotas
-  * Higher acceleration limit at low speed, lower limit at high speed
-  * Decrease `a_change_cost` timescale to be closer to toyota lag values
-* Hybrid Battery Saver, Max of 8 Hours of Standby
-  * The standby time improved significantly around version 0.8, however I recently had my 12v replaced under warranty because it failed the load test. I strongly suspect the Comma is to blame.  8 hours of standby time is more than enough to upload my drive data and stay on while I am at work.  It does mean a fresh bootup every morning, however, the C3 boot times are very reasonable ~30s.
+  * Higher planner acceleration limit at low speed, lower limit at high speed
+  * Increase PID acceleration limit at low speed.
+* __Hybrid Battery Saver__ - Maximum of 8 Hours of Standby [Feature Battery Saver](https://github.com/krkeegan/openpilot/tree/feature_battery_saver)
+  * Hybrids have tiny 12v batteries, turn off the comma after a maximum of 8 hours of standby.
+  * Also adjust the tracking battery capacity in openpilot for more accurate performance.
+  * 8 hours of standby time is more than enough to upload my drive data and stay on while I am at work.
+* __Engine Braking__ - Allow engine braking [Feature Sport Gear](https://github.com/krkeegan/openpilot/tree/feature_sport_gear)
+  * Allows openpilot to stay engaged when the gear selector is shifted into S mode.
+  * This allows for engine braking on downhills.
+    * _Note_ According to the vehicle manual enabling "sport mode" may also create some engine braking.
+  * I have not noticed any significant change to longitudinal controller performance when S mode is engaged.  However, please use caution when using it.
+  * __Note:__ _Openpilot will disengage without warning if S mode is shifted below S4.  This is because Toyota does not allow cruise control below S4._
 * Other features from future versions of Openpilot as I see fit
 
 ### Abandoned Features
 * Raw toggle added back in to enable automatic log uploading. [Feature Raw Logs](https://github.com/krkeegan/openpilot/tree/feature_raw_logs_upload)
-  * Comma blocks the upload of full camera and log files from the device with an http 412 error.  I suspect they are trying to save money on bandwidth costs.  I think the block tirggered when a device authentication is used, so presumably you could get around this by generating and copying a new authentication to the device.  However I elected to use the API and have a little script that fires off whenever my device is seen on my home network.
+  * Comma blocks the upload of full camera and log files from the device with an http 412 error.  I suspect they are trying to save money on bandwidth costs.  I think the block is triggered when a device authentication is used, since I am still able to trigger an upload using a generated token, so presumably you could get around this by generating and copying a new authentication to the device.  However I elected to use the API and have a little script that fires off whenever my device is seen on my home network.
 
 ### Previous Features that have been Merged into Comma Repo:
-* Display blue barriers when openpilot is engaged.
-* Use wide camera for light sensor, better night performance.
+* Display blue barriers on car UI when openpilot is engaged.
+* Use wide camera as light sensor, better night performance of the screen brightness.
 * Toggle Disengage on Gas. (Openpilot adopted in 8.14)
 
 Will you add something?
