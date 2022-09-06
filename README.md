@@ -40,21 +40,21 @@ I am publishing this work to help others understand how openpilot works.  As suc
 Features
 ------
 Currently this fork contains the following modifications:
-* __Follow Distance Profiles__ - 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.  [Feature Toyota Distance Button](https://github.com/krkeegan/openpilot/tree/feature_toyota_distance_btn)
+* 📏 __Follow Distance Profiles__ - 3 Distance profiles that can be toggled using the distance follow button on the steering wheel.  [Feature Toyota Distance Button](https://github.com/krkeegan/openpilot/tree/feature_toyota_distance_btn)
   * These profiles are described below.
   * There are no on screen messages regarding the distance profile selected, only the icons on the vehicle's HUD.
-* __Disable Updates and Nags__ - Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
-* __Decrease Volume__ - Lower volume to 70% [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
-* __No More Sluggish Starts__ - Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
-* __Small Toyota Tweaks__ - Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
+* ⚠️ __Disable Updates and Nags__ - Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
+* 🔈 __Decrease Volume__ - Lower volume to 70% [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
+* 🏎️ __No More Sluggish Starts__ - Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
+* 🔧 __Small Toyota Tweaks__ - Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
   * Tweaks deal with the laggy acceleration response on toyotas
   * Higher planner acceleration limit at low speed, lower limit at high speed
   * Increase PID acceleration limit at low speed.
-* __Hybrid Battery Saver__ - Maximum of 8 Hours of Standby [Feature Battery Saver](https://github.com/krkeegan/openpilot/tree/feature_battery_saver)
+* 🔋 __Hybrid Battery Saver__ - Maximum of 8 Hours of Standby [Feature Battery Saver](https://github.com/krkeegan/openpilot/tree/feature_battery_saver)
   * Hybrids have tiny 12v batteries, turn off the comma after a maximum of 8 hours of standby.
   * Also adjust the tracking battery capacity in openpilot for more accurate performance.
   * 8 hours of standby time is more than enough to upload my drive data and stay on while I am at work.
-* __Engine Braking__ - Allow engine braking [Feature Sport Gear](https://github.com/krkeegan/openpilot/tree/feature_sport_gear)
+* 🅱️ __Engine Braking__ - Allow engine braking [Feature Sport Gear](https://github.com/krkeegan/openpilot/tree/feature_sport_gear)
   * Allows openpilot to stay engaged when the gear selector is shifted into S mode.
   * This allows for engine braking on downhills.
     * _Note_ According to the vehicle manual enabling "sport mode" may also create some engine braking.
