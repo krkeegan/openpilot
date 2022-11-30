@@ -12,7 +12,7 @@
 // TODO: detect when we can't play sounds
 // TODO: detect when we can't display the UI
 
-Sound::Sound(QObject *parent) : sm({"carState", "controlsState", "deviceState"}) {
+Sound::Sound(QObject *parent) : sm({"controlsState", "deviceState", "microphone"}) {
   qInfo() << "default audio device: " << QAudioDeviceInfo::defaultOutputDevice().deviceName();
 
   for (auto &[alert, fn, loops] : sound_list) {
@@ -20,7 +20,6 @@ Sound::Sound(QObject *parent) : sm({"carState", "controlsState", "deviceState"})
     QObject::connect(s, &QSoundEffect::statusChanged, [=]() {
       assert(s->status() != QSoundEffect::Error);
     });
-    s->setVolume(Hardware::MIN_VOLUME);
     s->setSource(QUrl::fromLocalFile("../../assets/sounds/" + fn));
     sounds[alert] = {s, loops};
   }
@@ -48,15 +47,10 @@ void Sound::update() {
   }
 
   // scale volume with speed
-  if (sm.updated("carState")) {
-    float volume = util::map_val(sm["carState"].getCarState().getVEgo(), 11.f, 30.f, 0.f, 1.0f);  // KRKeegan max volume at ~65mph
+  if (sm.updated("microphone")) {
+    float volume = util::map_val(sm["microphone"].getMicrophone().getFilteredSoundPressureWeightedDb(), 30.f, 55.f, 0.f, 1.f);
     volume = QAudio::convertVolume(volume, QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
-    float max_volume_scale = 0.7;  // KRKeegan percentage of default max volume
-    float min_volume_scale = 0.3;  // KRKeegan percentage of default min volume
-    volume = util::map_val(volume, 0.f, 1.f, Hardware::MIN_VOLUME * min_volume_scale, Hardware::MAX_VOLUME * max_volume_scale);
-    for (auto &[s, loops] : sounds) {
-      s->setVolume(std::round(100 * volume) / 100);
-    }
+    Hardware::set_volume(volume);
   }
 
   setAlert(Alert::get(sm, started_frame));

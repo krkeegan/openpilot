@@ -1961,6 +1961,15 @@ struct EncodeData {
 struct UserFlag {
 }
 
+struct Microphone {
+  soundPressure @0 :Float32;
+
+  # uncalibrated, A-weighted
+  soundPressureWeighted @3 :Float32;
+  soundPressureWeightedDb @1 :Float32;
+  filteredSoundPressureWeightedDb @2 :Float32;
+}
+
 struct Event {
   logMonoTime @0 :UInt64;  # nanoseconds
   valid @67 :Bool = true;
@@ -2019,6 +2028,9 @@ struct Event {
     driverEncodeIdx @76 :EncodeIndex;
     wideRoadEncodeIdx @77 :EncodeIndex;
     qRoadEncodeIdx @90 :EncodeIndex;
+
+    # microphone data
+    microphone @103 :Microphone;
 
     # systems stuff
     androidLog @20 :AndroidLogEntry;
