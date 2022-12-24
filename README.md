@@ -52,7 +52,8 @@ Currently this fork contains the following modifications:
   * Increase PID acceleration limit at low speed.
 * 🔋 __Hybrid Battery Saver__ - Maximum of 8 Hours of Standby [Feature Battery Saver](https://github.com/krkeegan/openpilot/tree/feature_battery_saver)
   * Hybrids have tiny 12v batteries, turn off the comma after a maximum of 8 hours of standby.
-  * Also adjust the tracking battery capacity in openpilot for more accurate performance.
+  * Also decreases the battery capacity used in calculations.
+  * Raises the minimum voltage level to prevent damage to the battery.
   * 8 hours of standby time is more than enough to upload my drive data and stay on while I am at work.
 * 🅱️ __Engine Braking__ - Allow engine braking [Feature Sport Gear](https://github.com/krkeegan/openpilot/tree/feature_sport_gear)
   * Allows openpilot to stay engaged when the gear selector is shifted into S mode.
