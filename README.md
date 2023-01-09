@@ -45,7 +45,7 @@ Currently this fork contains the following modifications:
   * There are no on screen messages regarding the distance profile selected, only the icons on the vehicle's HUD.
   * Distance profiles do not do anything in e2e mode (_currently_).
 * ⚠️ __Disable Updates and Nags__ - Updates are permanently disabled and must be performed using `ssh` and `git`. [Feature Disable Updates](https://github.com/krkeegan/openpilot/tree/feature_disable_updates_testing_msg)
-* 🔈 __Decrease Volume__ - Lower the max and min volumes. [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume)
+* 🔈 __Alert Volumes Based on Ambient Noise Level__ - Sets the alert volume based on the ambient noise volume, feature will be in the next OpenPilot release. [Future Ambient Sound](https://github.com/krkeegan/openpilot/tree/future_ambient_sound)
 * 🏎️ __No More Sluggish Starts__ - Improve the starting acceleration off the line.  See below. [Feature Slow Start](https://github.com/krkeegan/openpilot/tree/feature_fix_slow_start)
 * 🔧 __Small Toyota Tweaks__ - Specific tuning for my vehicle and my tastes. [Feature Toyota Tune](https://github.com/krkeegan/openpilot/tree/feature_toyota_tune)
   * Slightly lower acceleration limit at high speed
@@ -64,6 +64,7 @@ Currently this fork contains the following modifications:
 * Other features from future versions of Openpilot as I see fit
 
 ### Abandoned Features
+* Tweak alert volumes. [Feature Lower Volume](https://github.com/krkeegan/openpilot/tree/feature_lower_volume) is no longer needed now that the device adjusts its volume based on the ambient noise level in the car.
 * Raw toggle added back in to enable automatic log uploading. [Feature Raw Logs](https://github.com/krkeegan/openpilot/tree/feature_raw_logs_upload)
   * Comma blocks the upload of full camera and log files from the device with an http 412 error.  I suspect they are trying to save money on bandwidth costs.  I think the block is triggered when a device authentication is used, since I am still able to trigger an upload using a generated token, so presumably you could get around this by generating and copying a new authentication to the device.  However I elected to use the API and have a little script that fires off whenever my device is seen on my home network.
 
