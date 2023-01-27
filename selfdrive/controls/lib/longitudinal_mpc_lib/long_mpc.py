@@ -280,10 +280,10 @@ class LongitudinalMpc:
 
   def set_weights(self, prev_accel_constraint=True, v_lead0=0, v_lead1=0):
     if self.mode == 'acc':
-      cost_mulitpliers = self.get_cost_multipliers(v_lead0, v_lead1)
+      cost_multipliers = self.get_cost_multipliers(v_lead0, v_lead1)
       a_change_cost = A_CHANGE_COST if prev_accel_constraint else 0
-      cost_weights = [X_EGO_OBSTACLE_COST, X_EGO_COST, V_EGO_COST, A_EGO_COST, a_change_cost * cost_mulitpliers[0], J_EGO_COST * cost_mulitpliers[1]]
-      constraint_cost_weights = [LIMIT_COST, LIMIT_COST, LIMIT_COST, DANGER_ZONE_COST * cost_mulitpliers[2]]
+      cost_weights = [X_EGO_OBSTACLE_COST, X_EGO_COST, V_EGO_COST, A_EGO_COST, a_change_cost * cost_multipliers[0], J_EGO_COST * cost_multipliers[1]]
+      constraint_cost_weights = [LIMIT_COST, LIMIT_COST, LIMIT_COST, DANGER_ZONE_COST * cost_multipliers[2]]
     elif self.mode == 'blended':
       a_change_cost = 40.0 if prev_accel_constraint else 0
       cost_weights = [0., 0.1, 0.2, 5.0, a_change_cost, 1.0]
