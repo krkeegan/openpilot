@@ -9,7 +9,7 @@ from openpilot.system.statsd import statlog
 CAR_VOLTAGE_LOW_PASS_K = 0.011 # LPF gain for 45s tau (dt/tau / (dt/tau + 1))
 
 # While driving, a battery charges completely in about 30-60 minutes
-CAR_BATTERY_CAPACITY_uWh = 30e6
+CAR_BATTERY_CAPACITY_uWh = 14e6
 CAR_CHARGING_RATE_W = 45
 
 VBATT_PAUSE_CHARGING = 11.8           # Lower limit on the LPF car battery voltage
