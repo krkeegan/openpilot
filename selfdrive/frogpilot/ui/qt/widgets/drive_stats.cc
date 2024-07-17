@@ -17,7 +17,7 @@ DriveStats::DriveStats(QWidget *parent) : QFrame(parent) {
 
   addStatsLayouts(tr("ALL TIME"), all);
   addStatsLayouts(tr("PAST WEEK"), week);
-  addStatsLayouts(tr("FROGPILOT"), frogPilot, true);
+  addStatsLayouts(tr("FORK"), frogPilot, false);
 
   std::optional<QString> dongleId = getDongleId();
   if (dongleId.has_value()) {
