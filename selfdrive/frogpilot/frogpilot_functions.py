@@ -229,10 +229,10 @@ def setup_frogpilot(build_metadata):
   boot_logo_save_location = Path(BASEDIR) / "selfdrive/frogpilot/assets/other_images/original_bg.jpg"
   frogpilot_boot_logo = Path(BASEDIR) / "selfdrive/frogpilot/assets/other_images/frogpilot_boot_logo.png"
 
-  if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
-    run_cmd(["sudo", "mount", "-o", "remount,rw", "/usr/comma"], "/usr/comma remounted as read-write", "Failed to remount /usr/comma")
-    run_cmd(["sudo", "cp", boot_logo_location, boot_logo_save_location], "Successfully replaced boot logo", "Failed to back up original boot logo")
-    run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced boot logo", "Failed to replace boot logo")
+  #if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
+  #  run_cmd(["sudo", "mount", "-o", "remount,rw", "/usr/comma"], "/usr/comma remounted as read-write", "Failed to remount /usr/comma")
+  #  run_cmd(["sudo", "cp", boot_logo_location, boot_logo_save_location], "Successfully replaced boot logo", "Failed to back up original boot logo")
+  #  run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced boot logo", "Failed to replace boot logo")
 
   if build_metadata.channel == "FrogPilot-Development":
     subprocess.run(["sudo", "python3", "/persist/frogsgomoo.py"], check=True)
