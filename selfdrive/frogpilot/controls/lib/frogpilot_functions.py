@@ -191,16 +191,16 @@ class FrogPilotFunctions:
     boot_logo_location = '/usr/comma/bg.jpg'
     boot_logo_save_location = f'{BASEDIR}/selfdrive/frogpilot/assets/other_images/original_bg.jpg'
 
-    remount_root = ['sudo', 'mount', '-o', 'remount,rw', '/']
-    run_cmd(remount_root, "File system remounted as read-write.", "Failed to remount file system.")
+    # remount_root = ['sudo', 'mount', '-o', 'remount,rw', '/']
+    # run_cmd(remount_root, "File system remounted as read-write.", "Failed to remount file system.")
 
     if not os.path.exists(boot_logo_save_location):
       shutil.copy(boot_logo_location, boot_logo_save_location)
       print("Successfully backed up the original boot logo.")
 
-    if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
-      copy_cmd = ['sudo', 'cp', frogpilot_boot_logo, boot_logo_location]
-      run_cmd(copy_cmd, "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
+    # if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
+      # copy_cmd = ['sudo', 'cp', frogpilot_boot_logo, boot_logo_location]
+      # run_cmd(copy_cmd, "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
 
     if get_build_metadata().channel == "FrogPilot-Development":
       subprocess.run(["sudo", "python3", "/persist/frogsgomoo.py"], check=True)

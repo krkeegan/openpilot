@@ -43,7 +43,7 @@ DriveStats::DriveStats(QWidget* parent) : QFrame(parent) {
 
   add_stats_layouts(tr("ALL TIME"), all_);
   add_stats_layouts(tr("PAST WEEK"), week_);
-  add_stats_layouts(tr("FROGPILOT"), frogPilot_, true);
+  add_stats_layouts(tr("FORK"), frogPilot_, false);
 
   if (auto dongleId = getDongleId()) {
     QString url = CommaApi::BASE_URL + "/v1.1/devices/" + *dongleId + "/stats";
