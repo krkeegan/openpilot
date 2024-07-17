@@ -247,16 +247,16 @@ def setup_frogpilot(build_metadata, params):
   if not os.path.exists(frog_steering_wheel_destination):
     copy_if_exists(frog_steering_wheel_source, frog_steering_wheel_destination, single_file_name="frog.png")
 
-  remount_root = ["sudo", "mount", "-o", "remount,rw", "/"]
-  if not run_cmd(remount_root, "File system remounted as read-write.", "Failed to remount file system."):
-    HARDWARE.reboot()
+  #remount_root = ["sudo", "mount", "-o", "remount,rw", "/"]
+  #if not run_cmd(remount_root, "File system remounted as read-write.", "Failed to remount file system."):
+  #  HARDWARE.reboot()
 
   boot_logo_location = "/usr/comma/bg.jpg"
   boot_logo_save_location = os.path.join(BASEDIR, "selfdrive", "frogpilot", "assets", "other_images", "original_bg.jpg")
   frogpilot_boot_logo = os.path.join(BASEDIR, "selfdrive", "frogpilot", "assets", "other_images", "frogpilot_boot_logo.png")
 
-  if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
-    run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
+  #if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
+  #  run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
 
   if build_metadata.channel == "FrogPilot-Development":
     subprocess.run(["sudo", "python3", "/persist/frogsgomoo.py"], check=True)
