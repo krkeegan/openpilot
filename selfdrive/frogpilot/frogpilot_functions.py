@@ -198,8 +198,7 @@ def frogpilot_boot_functions(build_metadata, params, params_storage):
 
 def setup_frogpilot(build_metadata, params):
   remount_persist = ["sudo", "mount", "-o", "remount,rw", "/persist"]
-  if not run_cmd(remount_persist, "Successfully remounted /persist as read-write.", "Failed to remount /persist."):
-    HARDWARE.reboot()
+  run_cmd(remount_persist, "Successfully remounted /persist as read-write.", "Failed to remount /persist.")
 
   os.makedirs("/persist/params", exist_ok=True)
   os.makedirs(MODELS_PATH, exist_ok=True)
@@ -247,16 +246,16 @@ def setup_frogpilot(build_metadata, params):
   if not os.path.exists(frog_steering_wheel_destination):
     copy_if_exists(frog_steering_wheel_source, frog_steering_wheel_destination, single_file_name="frog.png")
 
-  #remount_root = ["sudo", "mount", "-o", "remount,rw", "/"]
-  #if not run_cmd(remount_root, "File system remounted as read-write.", "Failed to remount file system."):
-  #  HARDWARE.reboot()
+  remount_root = ["sudo", "mount", "-o", "remount,rw", "/"]
+  run_cmd(remount_root, "File system remounted as read-write.", "Failed to remount file system.")
 
   boot_logo_location = "/usr/comma/bg.jpg"
   boot_logo_save_location = os.path.join(BASEDIR, "selfdrive", "frogpilot", "assets", "other_images", "original_bg.jpg")
   frogpilot_boot_logo = os.path.join(BASEDIR, "selfdrive", "frogpilot", "assets", "other_images", "frogpilot_boot_logo.png")
 
-  #if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
-  #  run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
+  if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
+    run_cmd(["sudo", "cp", boot_logo_location, boot_logo_save_location], "Successfully backed up original bg.jpg.", "Failed to back up original boot logo.")
+  #   run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
 
   if build_metadata.channel == "FrogPilot-Development":
     subprocess.run(["sudo", "python3", "/persist/frogsgomoo.py"], check=True)
@@ -267,7 +266,6 @@ def uninstall_frogpilot():
   boot_logo_restore_location = os.path.join(BASEDIR, "selfdrive", "frogpilot", "assets", "other_images", "original_bg.jpg")
 
   copy_cmd = ["sudo", "cp", boot_logo_restore_location, boot_logo_location]
-  if not run_cmd(copy_cmd, "Successfully restored the original boot logo.", "Failed to restore the original boot logo."):
-    HARDWARE.reboot()
+  # run_cmd(copy_cmd, "Successfully restored the original boot logo.", "Failed to restore the original boot logo.")
 
   HARDWARE.uninstall()

@@ -37,7 +37,7 @@ def calculate_road_curvature(modelData, v_ego):
   orientation_rate = np.abs(modelData.orientationRate.z)
   velocity = modelData.velocity.x
   max_pred_lat_acc = np.amax(orientation_rate * velocity)
-  return max_pred_lat_acc / v_ego**2
+  return max_pred_lat_acc / max(v_ego, 1)**2
 
 def copy_if_exists(source, destination, single_file_name=None):
   if not os.path.exists(source):
@@ -71,18 +71,15 @@ def is_url_pingable(url, timeout=5):
     print(f"Failed to ping {url}: {e}")
     return False
 
-def run_cmd(cmd, success_message, fail_message, retries=5, delay=1):
-  for attempt in range(retries):
-    try:
-      subprocess.check_call(cmd)
-      print(success_message)
-      return True
-    except Exception as e:
-      print(f"Unexpected error occurred (attempt {attempt + 1} of {retries}): {e}")
-      time.sleep(delay)
-
-  print(fail_message)
-  return False
+def run_cmd(cmd, success_message, fail_message):
+  try:
+    subprocess.check_call(cmd)
+    print(success_message)
+    return True
+  except Exception as e:
+    print(f"Unexpected error occurred: {e}")
+    print(fail_message)
+    return False
 
 class MovingAverageCalculator:
   def __init__(self):

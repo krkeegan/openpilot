@@ -11,12 +11,9 @@ from types import SimpleNamespace
 from cereal import log
 import cereal.messaging as messaging
 import openpilot.system.sentry as sentry
-from openpilot.common.conversions import Conversions as CV
 from openpilot.common.params import Params, ParamKeyType
 from openpilot.common.text_window import TextWindow
-from openpilot.selfdrive.controls.lib.desire_helper import LANE_CHANGE_SPEED_MIN
 from openpilot.system.hardware import HARDWARE, PC
-from openpilot.system.hardware.power_monitoring import VBATT_PAUSE_CHARGING
 from openpilot.system.manager.helpers import unblock_stdout, write_onroad_params, save_bootlog
 from openpilot.system.manager.process import ensure_running
 from openpilot.system.manager.process_config import managed_processes
@@ -70,7 +67,7 @@ def manager_init() -> None:
     ("RecordFront", "0"),
     ("SshEnabled", "0"),
     ("TetheringEnabled", "0"),
-    ("LongitudinalPersonality", str(log.LongitudinalPersonality.standard))
+    ("LongitudinalPersonality", str(log.LongitudinalPersonality.standard)),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
@@ -88,7 +85,7 @@ def manager_init() -> None:
     else:
       params_storage.put(k, params.get(k))
 
-  params.put_bool_nonblocking("DoToggleReset", False)
+  params.remove("DoToggleReset")
 
   # Create folders needed for msgq
   try:
@@ -157,7 +154,6 @@ def manager_thread() -> None:
   cloudlog.info({"environ": os.environ})
 
   params = Params()
-  params_memory = Params("/dev/shm/params")
 
   ignore: list[str] = []
   if params.get("DongleId", encoding='utf8') in (None, UNREGISTERED_DONGLE_ID):
@@ -175,6 +171,8 @@ def manager_thread() -> None:
   started_prev = False
 
   # FrogPilot variables
+  params_memory = Params("/dev/shm/params")
+
   FrogPilotVariables().update(False)
   frogpilot_toggles = get_frogpilot_toggles(True)
   classic_model = frogpilot_toggles.classic_model

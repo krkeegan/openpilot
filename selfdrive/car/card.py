@@ -49,10 +49,16 @@ class Car:
 
       num_pandas = len(messaging.recv_one_retry(self.sm.sock['pandaStates']).pandaStates)
       disable_openpilot_long = self.params.get_bool("DisableOpenpilotLongitudinal")
-      experimental_long_allowed = not disable_openpilot_long and self.params.get_bool("ExperimentalLongitudinalEnabled")
+      experimental_long_allowed = self.params.get_bool("ExperimentalLongitudinalEnabled")
       self.CI, self.CP = get_car(self.can_sock, self.pm.sock['sendcan'], disable_openpilot_long, experimental_long_allowed, self.params, num_pandas)
     else:
       self.CI, self.CP = CI, CI.CP
+
+    # set alternative experiences from parameters
+    self.disengage_on_accelerator = self.params.get_bool("DisengageOnAccelerator")
+    self.CP.alternativeExperience = 0
+    if not self.disengage_on_accelerator:
+      self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
 
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
 
@@ -77,16 +83,11 @@ class Car:
     # FrogPilot variables
     self.frogpilot_toggles = get_frogpilot_toggles(True)
 
-    # set alternative experiences from parameters
-    self.disengage_on_accelerator = self.params.get_bool("DisengageOnAccelerator")
-    self.CP.alternativeExperience = 0
-    if not self.disengage_on_accelerator:
-      self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
-
     if self.params.get_bool("AlwaysOnLateral"):
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.ALWAYS_ON_LATERAL
+      self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
 
-    if self.params.get_int("AccelerationProfile") == 3:
+    if self.frogpilot_toggles.acceleration_profile == 3:
       self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.RAISE_LONGITUDINAL_LIMITS_TO_ISO_MAX
 
     # Write CarParams for controls and radard

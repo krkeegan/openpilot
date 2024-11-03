@@ -54,7 +54,7 @@ class ModelManager:
     elif "gitlab" in repo_url:
       api_url = f"https://gitlab.com/api/v4/projects/{urllib.parse.quote_plus(project_path)}/repository/tree?ref={branch}"
     else:
-      raise ValueError(f"Unsupported repository URL format: {repo_url}. Supported formats are GitHub and GitLab URLs.")
+      return {}
 
     try:
       response = requests.get(api_url)
@@ -72,8 +72,8 @@ class ModelManager:
         return model_sizes
       else:
         return {file['name'].replace('.thneed', ''): file['size'] for file in thneed_files if 'size' in file}
-
-    except:
+    except Exception as e:
+      raise ConnectionError(f"Failed to fetch model sizes from {'GitHub' if 'github' in repo_url else 'GitLab'}: {e}")
       return {}
 
   @staticmethod

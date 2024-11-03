@@ -62,18 +62,18 @@ class RouteEngine:
       self.mapbox_host = "https://api.mapbox.com"
     else:
       self.api = Api(self.params.get("DongleId", encoding='utf8'))
-      self.mapbox_host = os.getenv('MAPS_HOST', 'https://maps.comma.ai')
+      self.mapbox_host = "https://maps.comma.ai"
 
     # FrogPilot variables
     self.frogpilot_toggles = get_frogpilot_toggles(True)
-
-    self.stop_coord = []
-    self.stop_signal = []
 
     self.approaching_intersection = False
     self.approaching_turn = False
 
     self.nav_speed_limit = 0
+
+    self.stop_coord = []
+    self.stop_signal = []
 
   def update(self):
     self.sm.update(0)

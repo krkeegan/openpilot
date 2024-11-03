@@ -52,7 +52,7 @@ class TorqueBuckets(PointBuckets):
 
 
 class TorqueEstimator(ParameterEstimator):
-  def __init__(self, CP, torque_cache, decimated=False):
+  def __init__(self, CP, torque_key, decimated=False):
     self.hist_len = int(HISTORY / DT_MDL)
     self.lag = CP.steerActuatorDelay + .2   # from controlsd
     if decimated:
@@ -95,6 +95,7 @@ class TorqueEstimator(ParameterEstimator):
     # try to restore cached params
     params = Params()
     params_cache = params.get("CarParamsPrevRoute")
+    torque_cache = params.get(torque_key)
     if params_cache is not None and torque_cache is not None:
       try:
         with log.Event.from_bytes(torque_cache) as log_evt:
@@ -114,7 +115,7 @@ class TorqueEstimator(ParameterEstimator):
           cloudlog.info("restored torque params from cache")
       except Exception:
         cloudlog.exception("failed to restore cached torque params")
-        params.remove(self.torque_key)
+        params.remove(torque_key)
 
     self.filtered_params = {}
     for param in initial_params:
@@ -224,11 +225,12 @@ def main(demo=False):
   sm = messaging.SubMaster(['carControl', 'carOutput', 'carState', 'liveLocationKalman'], poll='liveLocationKalman')
 
   params = Params()
+
+  # FrogPilot variables
   torque_key = get_frogpilot_toggles(True).part_model_param + "LiveTorqueParameters"
-  torque_cache = params.get(torque_key)
 
   with car.CarParams.from_bytes(params.get("CarParams", block=True)) as CP:
-    estimator = TorqueEstimator(CP, torque_cache)
+    estimator = TorqueEstimator(CP, torque_key)
 
   while True:
     sm.update()

@@ -9,7 +9,7 @@ from sentry_sdk.integrations.threading import ThreadingIntegration
 
 from openpilot.common.params import Params, ParamKeyType
 from openpilot.system.athena.registration import is_registered_device
-from openpilot.system.hardware import PC
+from openpilot.system.hardware import HARDWARE, PC
 from openpilot.common.swaglog import cloudlog
 from openpilot.system.version import get_build_metadata, get_version
 
@@ -36,7 +36,6 @@ def capture_exception(*args, **kwargs) -> None:
   exc_text = traceback.format_exc()
 
   phrases_to_check = [
-    "To overwrite it, set 'overwrite' to True.",
   ]
 
   if any(phrase in exc_text for phrase in phrases_to_check):

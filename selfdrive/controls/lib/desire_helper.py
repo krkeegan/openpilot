@@ -49,7 +49,7 @@ class DesireHelper:
     # FrogPilot variables
     self.lane_change_completed = False
 
-    self.lane_change_wait_timer = 0.0
+    self.lane_change_wait_timer = 0
 
     self.turn_direction = TurnDirection.none
 
