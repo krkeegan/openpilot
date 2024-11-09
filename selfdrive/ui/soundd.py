@@ -24,8 +24,8 @@ MIN_VOLUME = 0.1
 CONTROLS_TIMEOUT = 5 # 5 seconds
 FILTER_DT = 1. / (micd.SAMPLE_RATE / micd.FFT_SAMPLES)
 
-AMBIENT_DB = 30 # DB where MIN_VOLUME is applied
-DB_SCALE = 30 # AMBIENT_DB + DB_SCALE is where MAX_VOLUME is applied
+AMBIENT_DB = 35 # DB where MIN_VOLUME is applied
+DB_SCALE = 35 # AMBIENT_DB + DB_SCALE is where MAX_VOLUME is applied
 
 AudibleAlert = car.CarControl.HUDControl.AudibleAlert
 
