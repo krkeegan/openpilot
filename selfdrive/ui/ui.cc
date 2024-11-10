@@ -527,6 +527,7 @@ void UIState::update() {
   scene.driver_camera_timer = scene.driver_camera_in_reverse && scene.reverse ? scene.driver_camera_timer + 1 : 0;
   scene.force_onroad = paramsMemory.getBool("ForceOnroad");
   scene.started_timer = scene.started || started_prev ? scene.started_timer + 1 : 0;
+  scene.screen_brightness_current = screen_brightness_current;
 }
 
 void UIState::setPrimeType(PrimeType type) {
@@ -600,6 +601,8 @@ void Device::updateBrightness(const UIState &s) {
   } else if (s.scene.screen_brightness != 101) {
     brightness = s.scene.screen_brightness;
   }
+
+  screen_brightness_current = brightness;
 
   if (brightness != last_brightness) {
     if (!brightness_future.isRunning()) {

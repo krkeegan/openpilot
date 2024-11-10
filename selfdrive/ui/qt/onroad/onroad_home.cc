@@ -214,6 +214,7 @@ void OnroadWindow::paintEvent(QPaintEvent *event) {
   // FrogPilot variables
   UIState *s = uiState();
   SubMaster &sm = *(s->sm);
+  UIScene &scene = s->scene;
 
   QRect rect = this->rect();
   QColor bgColor(bg.red(), bg.green(), bg.blue(), 255);
@@ -412,11 +413,13 @@ void OnroadWindow::paintEvent(QPaintEvent *event) {
       avgFPS = totalFPS / fpsQueue.size();
     }
 
-    QString fpsDisplayString = QString("FPS: %1 | Min: %3 | Max: %4 | Avg: %5")
+    QString fpsDisplayString = QString("FPS: %1 | Min: %3 | Max: %4 | Avg: %5 | Light Sensor: %6 | Current Brightness: %7")
         .arg(qRound(fps))
         .arg(qRound(minFPS))
         .arg(qRound(maxFPS))
-        .arg(qRound(avgFPS));
+        .arg(qRound(avgFPS))
+        .arg(qRound(scene.light_sensor))
+        .arg(qRound(scene.screen_brightness_current));
 
     p.setFont(InterFont(28, QFont::DemiBold));
     p.setRenderHint(QPainter::TextAntialiasing);
