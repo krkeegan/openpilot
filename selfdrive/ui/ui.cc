@@ -16,6 +16,8 @@
 #define BACKLIGHT_DT 0.05
 #define BACKLIGHT_TS 10.00
 
+int screen_brightness_current = 0;
+
 // Projects a point in car to space to the corresponding point in full frame
 // image space.
 static bool calib_frame_to_full_frame(const UIState *s, float in_x, float in_y, float in_z, QPointF *out) {
@@ -577,7 +579,7 @@ void Device::resetInteractiveTimeout(int timeout, int timeout_onroad) {
 
 void Device::updateBrightness(const UIState &s) {
   float clipped_brightness = offroad_brightness;
-  if (s.scene.started && s.scene.light_sensor > 0) {
+  if (s.scene.started && s.scene.light_sensor >= 0) {
     clipped_brightness = s.scene.light_sensor;
 
     // CIE 1931 - https://www.photonstophotos.net/GeneralTopics/Exposure/Psychometric_Lightness_and_Gamma.htm

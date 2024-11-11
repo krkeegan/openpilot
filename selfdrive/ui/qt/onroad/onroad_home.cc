@@ -419,7 +419,7 @@ void OnroadWindow::paintEvent(QPaintEvent *event) {
         .arg(qRound(maxFPS))
         .arg(qRound(avgFPS))
         .arg(qRound(scene.light_sensor))
-        .arg(qRound(scene.screen_brightness_current));
+        .arg(scene.screen_brightness_current);
 
     p.setFont(InterFont(28, QFont::DemiBold));
     p.setRenderHint(QPainter::TextAntialiasing);

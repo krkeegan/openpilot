@@ -20,7 +20,7 @@
 
 #include "selfdrive/frogpilot/ui/qt/widgets/frogpilot_controls.h"
 
-int screen_brightness_current = 0;
+extern int screen_brightness_current;
 
 const int UI_BORDER_SIZE = 30;
 const int UI_HEADER_HEIGHT = 420;
@@ -261,6 +261,7 @@ typedef struct UIScene {
   int screen_brightness;
   int screen_brightness_onroad;
   int screen_brightness_current;
+  int screen_brightness_filtered;
   int screen_timeout;
   int screen_timeout_onroad;
   int started_timer;
