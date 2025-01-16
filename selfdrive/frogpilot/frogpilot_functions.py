@@ -70,7 +70,7 @@ def cleanup_backups(directory, limit, success_message, fail_message, compressed=
 
 def backup_frogpilot(build_metadata):
   backup_path = Path("/data/backups")
-  maximum_backups = 5
+  maximum_backups = 2
   minimum_backup_size = params.get_int("MinimumBackupSize")
 
   cleanup_backups(backup_path, maximum_backups, f"Successfully cleaned up old FrogPilot backups", f"Failed to cleanup old FrogPilot backups", True)
