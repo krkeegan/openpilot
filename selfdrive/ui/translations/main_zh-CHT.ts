@@ -423,6 +423,10 @@
         <source>Miles</source>
         <translation type="gpt-5-generated">英里</translation>
     </message>
+    <message>
+        <source>FORK</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DriverViewWindow</name>
