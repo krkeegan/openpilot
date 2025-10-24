@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - FrogPilot
   pull_request:
   workflow_dispatch:
 
